@@ -78,6 +78,25 @@ console.log(JSON.stringify({ status: snap.state.agents['pkg-bot']?.stats, task: 
   const glb = await fetch(`${base}/models/robot/RobotExpressive.glb`);
   glb.ok ? ok('3D models served with the console') : fail('models not served');
 
+  // Claude Code bridge from the installed package, with a throwaway home dir
+  const home = path.join(dir, 'home');
+  const settingsFile = path.join(dir, 'claude-settings.json');
+  const ci = spawnSync(process.execPath, [path.join(mod('server'), 'cli.js'), 'claude-install', '--file', settingsFile, '--world-project', 'consumer'], {
+    cwd: dir,
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+  });
+  const hookArgs = fs.existsSync(settingsFile) ? JSON.parse(fs.readFileSync(settingsFile, 'utf8')).hooks?.PreToolUse?.[0]?.hooks?.[0]?.args : undefined;
+  if (ci.status === 0 && hookArgs && hookArgs[0].startsWith(home.replace(/\\/g, '/')) && fs.existsSync(hookArgs[0])) {
+    const hook = spawnSync(process.execPath, [...hookArgs], {
+      input: JSON.stringify({ hook_event_name: 'SessionStart', session_id: 'verify-session', cwd: dir }),
+      env: { ...process.env, AGENT_WORLD_URL: base },
+    });
+    const snap = await (await fetch(`${base}/v1/projects/consumer/snapshot`)).json();
+    hook.status === 0 && Object.keys(snap.state.agents).length > 1
+      ? ok('claude-install: hooks copied to a stable dir and report to the server')
+      : fail(`claude hook did not reach the server: ${hook.stderr}`);
+  } else fail(`claude-install failed: ${ci.stdout}${ci.stderr}`);
+
   const core = spawnSync(process.execPath, ['-e', "import('@agent-world/core').then(m => console.log(typeof m.createAgentWorldStore))"], { cwd: dir });
   core.stdout.toString().includes('function') ? ok('core imports in plain Node') : fail(`core import failed ${core.stderr}`);
 } finally {

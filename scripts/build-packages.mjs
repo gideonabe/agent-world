@@ -34,6 +34,8 @@ const PACKAGES = [
     inline: ['@agent-world/engine'],
     bin: { 'agent-world-server': './cli.js' },
     dashboard: true,
+    // the Claude Code bridge, run with `agent-world-server claude-install`
+    claudeCode: true,
   },
 ];
 
@@ -105,6 +107,11 @@ for (const p of PACKAGES) {
 
   // 3) Extras
   if (p.assets) fs.cpSync(path.join(pkgDir, 'assets'), path.join(dist, 'assets'), { recursive: true });
+  if (p.claudeCode) {
+    fs.mkdirSync(path.join(dist, 'claude-code'), { recursive: true });
+    for (const f of ['install.mjs', 'agent-world-hook.mjs', 'mapping.mjs', 'README.md'])
+      fs.copyFileSync(path.join(root, 'integrations', 'claude-code', f), path.join(dist, 'claude-code', f));
+  }
   if (p.dashboard) fs.cpSync(path.join(root, 'apps', 'dashboard', 'dist'), path.join(dist, 'dashboard'), { recursive: true });
   for (const f of ['README.md']) if (fs.existsSync(path.join(pkgDir, f))) fs.copyFileSync(path.join(pkgDir, f), path.join(dist, f));
   fs.copyFileSync(path.join(root, "LICENSE"), path.join(dist, "LICENSE"));

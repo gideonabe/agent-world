@@ -11,12 +11,21 @@
 //   --url <base url>       server URL (default http://127.0.0.1:8787)
 //
 // Existing settings and hooks are preserved; a timestamped backup is written first.
+//
+// Also available from the published server package:
+//   npx @agent-world/server claude-install [--project <dir> | --user] [...]
+// When run from an installed package (node_modules or the npx cache), the hook scripts are
+// copied to ~/.agent-world/claude-code first, so the hooks keep working after npx cleans up.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const HOOK = fileURLToPath(new URL('./agent-world-hook.mjs', import.meta.url)).replace(/\\/g, '/');
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const HOOK_FILES = ['agent-world-hook.mjs', 'mapping.mjs'];
+const installedFromPackage = /[\\/](node_modules|_npx)[\\/]/.test(HERE);
+const HOOK_DIR = installedFromPackage ? path.join(os.homedir(), '.agent-world', 'claude-code') : HERE;
+const HOOK = path.join(HOOK_DIR, 'agent-world-hook.mjs').replace(/\\/g, '/');
 const NODE = process.execPath.replace(/\\/g, '/');
 
 /** event → matcher (null = event takes no matcher). */
@@ -101,6 +110,14 @@ if (has('--dry-run')) {
   process.exit(0);
 }
 
+if (!has('--uninstall') && HOOK_DIR !== HERE) {
+  fs.mkdirSync(HOOK_DIR, { recursive: true });
+  for (const f of HOOK_FILES) fs.copyFileSync(path.join(HERE, f), path.join(HOOK_DIR, f));
+  // the copied scripts are ES modules; make that explicit for Node
+  fs.writeFileSync(path.join(HOOK_DIR, 'package.json'), '{ "type": "module" }\n');
+  console.log(`Hook scripts: ${HOOK_DIR}`);
+}
+
 fs.mkdirSync(path.dirname(target), { recursive: true });
 if (fs.existsSync(target)) {
   const backup = `${target}.bak-${new Date().toISOString().replace(/[:.]/g, '-')}`;
@@ -110,10 +127,10 @@ if (fs.existsSync(target)) {
 fs.writeFileSync(target, out);
 console.log(`${has('--uninstall') ? 'Removed Agent World hooks from' : 'Installed Agent World hooks into'} ${target}`);
 if (!has('--uninstall')) {
-  console.log('Start the server with:  npm run server:empty   (in the agent-world folder)');
   const proj = val('--world-project') ?? 'default';
-  const base = val('--url') ?? 'http://127.0.0.1:8787';
-  console.log(`Open the world at:      http://localhost:5173/?server=${base}&project=${proj}${val('--key') ? '&token=<a read key>' : ''}`);
+  const base = (val('--url') ?? 'http://127.0.0.1:8787').replace(/\/+$/, '');
+  console.log(`Start the server with:  ${installedFromPackage ? 'npx @agent-world/server' : 'npm run server:empty   (in the agent-world folder)'}`);
+  console.log(`Watch it at:            ${base}/#/p/${encodeURIComponent(proj)}`);
   if (val('--key')) console.log('Note: the API key is stored in that settings file. Keep it out of version control.');
   console.log('Restart that Claude Code session (or check /hooks) so it picks up the new hooks.');
 }

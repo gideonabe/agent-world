@@ -22,6 +22,9 @@ RUN npm run build:packages
 
 # ---- runtime: install only the published server tarballs ----
 FROM node:22-alpine
+LABEL org.opencontainers.image.source="https://github.com/gideonabe/agent-world" \
+      org.opencontainers.image.description="Agent World server and console" \
+      org.opencontainers.image.licenses="MIT"
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /app/release/ /tmp/pkg/

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +26,15 @@ const HELP = `Agent World server
   keys create --project <id> [--role write|read] [--name <label>]
   keys revoke <keyId>
   admin-token reset        print a new admin token (invalidates the old one)
+
+  claude-install           show your Claude Code sessions as robots (adds hooks)
+    --project <dir>        that project only (default: the current folder)
+    --user                 every Claude Code session on this machine
+    --world-project <id>   Agent World project to report into
+    --key <write key>      needed when the server runs with --auth
+    --url <base url>       default http://127.0.0.1:8787
+    --dry-run              print the settings without writing
+  claude-uninstall         remove those hooks (same --project / --user)
 
   All management commands take --data <dir> too and work while the server runs.
 `;
@@ -136,7 +146,22 @@ function manage(cmd: string, sub: string | undefined) {
   fail(`unknown command "${cmd} ${sub ?? ''}"\n\n${HELP}`);
 }
 
+/** Runs the Claude Code bridge installer (shipped in dist/claude-code, or the repo's integrations/). */
+function claudeInstall(uninstall: boolean): never {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const script = [path.resolve(here, 'claude-code/install.mjs'), path.resolve(here, '../../../integrations/claude-code/install.mjs')].find((p) =>
+    fs.existsSync(p),
+  );
+  if (!script) fail('the Claude Code bridge is not included in this build');
+  const rest = argv.slice(argv.indexOf(positional[0]!) + 1);
+  if (!['--project', '--user', '--file'].some((f) => rest.includes(f))) rest.push('--project', process.cwd());
+  if (uninstall) rest.push('--uninstall');
+  const r = spawnSync(process.execPath, [script, ...rest], { stdio: 'inherit' });
+  process.exit(r.status ?? 1);
+}
+
 const [cmd, sub] = positional;
 if (flag('help') || cmd === 'help') console.log(HELP);
+else if (cmd === 'claude-install' || cmd === 'claude-uninstall') claudeInstall(cmd === 'claude-uninstall');
 else if (!cmd || cmd === 'serve') await serve();
 else manage(cmd, sub);

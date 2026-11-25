@@ -19,30 +19,34 @@ This bridge shows your Claude Code sessions as robots on the island, live.
 ## Setup
 
 ```bash
-# 1. in the agent-world folder: start a server without the simulator, then the viewer
-npm run server:empty
-npm run dev            # open http://localhost:5173/?ws=ws://127.0.0.1:8787/ws
+# 1. in the agent-world folder: start a server without the simulator
+npm run server:empty   # the console is at http://127.0.0.1:8787
 
 # 2. install the hooks into the project you're working on (personal file, not committed)
-node integrations/claude-code/install.mjs --project "C:/path/to/your/project"
+npm run aw -- claude-install --project "C:/path/to/your/project"
 #    or for every Claude Code session on this machine:
-node integrations/claude-code/install.mjs --user
+npm run aw -- claude-install --user
 ```
 
-Then restart that Claude Code session, or run `/hooks` in it to confirm the hooks are listed.
+Then restart that Claude Code session, or run `/hooks` in it to confirm the hooks are listed. Your session shows up in
+the console under the `default` project.
+
+The same commands ship in the server package, so once it's installed from npm you don't need this repo:
+`npx @agent-world/server claude-install` (defaults to the current folder). That copies the hook scripts to
+`~/.agent-world/claude-code` so they keep working after npx cleans up.
 
 ### Reporting into a project on a secured server
 
 ```bash
 npm run aw -- keys create --project my-app --role write --name claude-code
-node integrations/claude-code/install.mjs --project "C:/path/to/project" --world-project my-app --key aww_…
+npm run aw -- claude-install --project "C:/path/to/project" --world-project my-app --key aww_…
 ```
 
 The key is saved in that project's `.claude/settings.local.json`, so keep that file out of version control. Watch
-the session at `/?server=http://127.0.0.1:8787&project=my-app&token=<read key>`.
+the session in the console under the `my-app` project.
 
-To remove the hooks: `node integrations/claude-code/install.mjs --project "<path>" --uninstall`. Add `--dry-run`
-to print the result without writing. The installer keeps your other settings and hooks, and writes a timestamped
+To remove the hooks: `npm run aw -- claude-uninstall --project "<path>"`. Add `--dry-run` to print the result
+without writing. The installer keeps your other settings and hooks, and writes a timestamped
 backup before it changes anything.
 
 ## Safety
