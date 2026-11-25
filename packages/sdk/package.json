@@ -1,0 +1,18 @@
+{
+  "name": "@agent-world/sdk",
+  "version": "0.1.0",
+  "description": "Tiny client for sending agent activity to an Agent World server (Node 18+ and browsers).",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@agent-world/protocol": "0.1.0"
+  },
+  "devDependencies": {
+    "@agent-world/server": "0.1.0",
+    "@agent-world/engine": "0.1.0"
+  }
+}

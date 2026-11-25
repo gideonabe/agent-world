@@ -1,0 +1,10 @@
+{
+  "name": "@agent-world/protocol",
+  "version": "0.1.0",
+  "description": "Standardized agent/task/event types and schemas for Agent World.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "zod": "^4.6.7" }
+}

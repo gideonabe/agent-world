@@ -1,0 +1,36 @@
+{
+  "name": "agent-world",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Standalone, reusable 3D visualization platform for AI agents.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @agent-world/playground",
+    "build": "npm run build -w @agent-world/playground && npm run build -w @agent-world/dashboard",
+    "preview": "npm run preview -w @agent-world/playground",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "server": "tsx packages/server/src/cli.ts --mock --memory",
+    "server:empty": "tsx packages/server/src/cli.ts",
+    "claude:install": "node integrations/claude-code/install.mjs",
+    "server:auth": "tsx packages/server/src/cli.ts --auth",
+    "aw": "tsx packages/server/src/cli.ts",
+    "build:dashboard": "npm run build -w @agent-world/dashboard",
+    "dev:dashboard": "npm run dev -w @agent-world/dashboard",
+    "build:packages": "node scripts/build-packages.mjs",
+    "verify:packages": "node scripts/verify-packages.mjs"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^5.1.1",
+    "esbuild": "^0.28.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
