@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
-import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-world/core';
-import type { WorldConfig } from '@agent-world/protocol';
+import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-viz/core';
+import type { WorldConfig } from '@agent-viz/protocol';
 import { AgentWorld, type AgentWorldProps } from './AgentWorld';
 import { meadowIsland } from './presets/meadowIsland';
 

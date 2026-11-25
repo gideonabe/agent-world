@@ -1,4 +1,4 @@
-import type { AgentWorldEvent } from '@agent-world/protocol';
+import type { AgentWorldEvent } from '@agent-viz/protocol';
 import type { WorldState } from './types';
 
 export interface LifecycleOptions {

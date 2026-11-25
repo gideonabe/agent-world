@@ -30,12 +30,12 @@ WORKDIR /app
 COPY --from=build /app/release/ /tmp/pkg/
 RUN echo '{"name":"agent-world-runtime","private":true,"type":"module"}' > package.json \
  && npm install --omit=dev --no-audit --no-fund \
-      /tmp/pkg/agent-world-protocol-*.tgz /tmp/pkg/agent-world-core-*.tgz /tmp/pkg/agent-world-server-*.tgz \
+      /tmp/pkg/agent-viz-protocol-*.tgz /tmp/pkg/agent-viz-core-*.tgz /tmp/pkg/agent-viz-server-*.tgz \
  && rm -rf /tmp/pkg ~/.npm \
  && mkdir -p /data && chown node:node /data
 USER node
 VOLUME /data
 EXPOSE 8787
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1:8787/health || exit 1
-ENTRYPOINT ["node", "node_modules/@agent-world/server/cli.js"]
+ENTRYPOINT ["node", "node_modules/@agent-viz/server/cli.js"]
 CMD ["--host", "0.0.0.0", "--port", "8787", "--auth", "--data", "/data"]

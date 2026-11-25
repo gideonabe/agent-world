@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { AgentState } from '@agent-world/core';
-import type { Task } from '@agent-world/protocol';
+import type { AgentState } from '@agent-viz/core';
+import type { Task } from '@agent-viz/protocol';
 import { NavGraph } from '../src/navigation/navGraph';
 import { intentFor, intentKey, reactionFor } from '../src/characters/intent';
 import { meadowIsland } from '../src/presets/meadowIsland';

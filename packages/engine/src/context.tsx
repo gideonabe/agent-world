@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import type { AgentWorldStore } from '@agent-world/core';
-import type { WorldConfig } from '@agent-world/protocol';
+import type { AgentWorldStore } from '@agent-viz/core';
+import type { WorldConfig } from '@agent-viz/protocol';
 import { NavGraph } from './navigation/navGraph';
 import type { Theme } from './themes/theme';
 import type { AgentMotion } from './characters/agentMotion';

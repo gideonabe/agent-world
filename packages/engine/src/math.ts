@@ -1,4 +1,4 @@
-import type { StationDef, Vec2 } from '@agent-world/protocol';
+import type { StationDef, Vec2 } from '@agent-viz/protocol';
 
 /** Rotates a station-local offset into world space (matches three.js Y rotation). */
 export function stationToWorld(station: StationDef, local: Vec2): Vec2 {

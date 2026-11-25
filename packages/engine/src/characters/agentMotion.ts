@@ -1,4 +1,4 @@
-import type { StationDef, Vec2 } from '@agent-world/protocol';
+import type { StationDef, Vec2 } from '@agent-viz/protocol';
 import type { NavGraph } from '../navigation/navGraph';
 import { angleDelta, hashString, mulberry32, slotPose } from '../math';
 

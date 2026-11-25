@@ -1,6 +1,6 @@
 import { useStore } from 'zustand';
-import type { AgentWorldStore } from '@agent-world/core';
-import { meadowTheme, STATUS_COLORS } from '@agent-world/engine';
+import type { AgentWorldStore } from '@agent-viz/core';
+import { meadowTheme, STATUS_COLORS } from '@agent-viz/engine';
 import { STATUS_LABEL } from './format';
 
 interface Props {

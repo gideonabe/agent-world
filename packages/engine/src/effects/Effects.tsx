@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import type { AgentWorldStoreState } from '@agent-world/core';
-import type { EventEnvelope } from '@agent-world/protocol';
+import type { AgentWorldStoreState } from '@agent-viz/core';
+import type { EventEnvelope } from '@agent-viz/protocol';
 import { useEngine } from '../context';
 import { BURSTS, ParticlePool, type BurstSpec } from './particles';
 

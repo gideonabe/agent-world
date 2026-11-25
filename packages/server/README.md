@@ -1,4 +1,4 @@
-# @agent-world/server
+# @agent-viz/server
 
 The authoritative hub. It keeps every project's world state, accepts events over HTTP or WebSocket, and streams
 changes to viewers.

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
-import type { PropPlacement } from '@agent-world/protocol';
+import type { PropPlacement } from '@agent-viz/protocol';
 import { useEngine } from '../context';
 import { resolveModelUrl } from '../themes/theme';
 

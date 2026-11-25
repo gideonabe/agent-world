@@ -1,4 +1,4 @@
-import { isTerminalStatus, type AgentStatus, type StationDef, type Task } from '@agent-world/protocol';
+import { isTerminalStatus, type AgentStatus, type StationDef, type Task } from '@agent-viz/protocol';
 import type { AgentState, WorldState } from './types';
 import type { AgentWorldStoreState } from './store';
 

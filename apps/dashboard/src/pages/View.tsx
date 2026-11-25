@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from 'zustand';
-import { AgentWorld, meadowTheme, useRemoteWorld } from '@agent-world/engine';
+import { AgentWorld, meadowTheme, useRemoteWorld } from '@agent-viz/engine';
 import type { AdminApi } from '../api';
 import { href } from '../router';
 

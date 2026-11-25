@@ -1,4 +1,4 @@
-import type { AgentDescriptor, AgentDestination, AgentStatus, EventEnvelope, Task } from '@agent-world/protocol';
+import type { AgentDescriptor, AgentDestination, AgentStatus, EventEnvelope, Task } from '@agent-viz/protocol';
 
 export type TaskOutcomeKind = 'completed' | 'failed' | 'cancelled';
 

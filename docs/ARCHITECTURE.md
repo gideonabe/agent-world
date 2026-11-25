@@ -13,7 +13,7 @@ Environment: Node v26.13, npm 11.20, no pnpm → **npm workspaces** monorepo.
 | State | zustand (vanilla store + React hook) | engine core usable outside React (SDK, server) |
 | Realtime | native WebSocket (browser) / `ws` (Node) | no socket.io dependency |
 | Server | Node + Fastify + `ws` (Phase 5) | small, typed, fast |
-| Validation | zod in `@agent-world/protocol` | one schema shared by client, server, SDK |
+| Validation | zod in `@agent-viz/protocol` | one schema shared by client, server, SDK |
 | Tests | vitest | unit tests for store reducers, pathing, protocol |
 | Assets | CC0 GLB packs (Quaternius robot, Kenney nature + furniture) + procedural terrain/water/paths | rich rigged animations, swappable via theme config |
 
@@ -26,18 +26,18 @@ agent-world/
   tsconfig.base.json
   README.md
   packages/
-    protocol/                 # @agent-world/protocol — PURE types + zod schemas, no deps beyond zod
+    protocol/                 # @agent-viz/protocol — PURE types + zod schemas, no deps beyond zod
       src/agent.ts            # AgentDescriptor, AgentKind, AgentStatus
       src/task.ts             # Task, TaskStatus, progress
       src/events.ts           # AgentWorldEvent discriminated union (agent.registered, task.assigned,
                               #   task.progress, task.completed, task.failed, agent.status, agent.removed)
       src/world.ts            # WorldConfig, StationDef, ThemeDef
-    core/                     # @agent-world/core — framework-agnostic agent management (no React, no three)
+    core/                     # @agent-viz/core — framework-agnostic agent management (no React, no three)
       src/store.ts            # zustand/vanilla store: agents, tasks, stations, event log
       src/reducer.ts          # applyEvent(state, event) — single source of truth for state transitions
       src/stationRouter.ts    # task kind → station selection, occupancy/queueing
       src/sources/            # EventSource interface + MockEventSource (+ WebSocketEventSource in Phase 4)
-    engine/                   # @agent-world/engine — React Three Fiber visualization (consumes core store)
+    engine/                   # @agent-viz/engine — React Three Fiber visualization (consumes core store)
       src/AgentWorld.tsx      # public <AgentWorld store theme world /> component (Canvas root)
       src/environment/        # Island, Water, Paths, Trees, Rocks, Clouds, Lighting, Sky
       src/stations/           # Workstation base + ResearchLab, CodingDesk, WritingDesk, AutomationHub, IdlePlaza
@@ -46,8 +46,8 @@ agent-world/
       src/camera/             # isometric-ish orbit rig, focus-on-agent
       src/themes/             # theme registry (palettes, robot variants, station meshes or GLB urls)
       src/hooks/              # useAgentMotion, useAgents (selectors)
-    sdk/                      # @agent-world/sdk — Phase 5 (client.registerAgent / emit / task helpers)
-    server/                   # @agent-world/server — Phase 5 (Fastify REST + WS hub, projects, API keys)
+    sdk/                      # @agent-viz/sdk — Phase 5 (client.registerAgent / emit / task helpers)
+    server/                   # @agent-viz/server — Phase 5 (Fastify REST + WS hub, projects, API keys)
   apps/
     playground/               # Vite app: full-screen world + overlay UI, wired to MockEventSource
       src/App.tsx
@@ -76,7 +76,7 @@ Dependency direction: `protocol ← core ← engine ← apps`; `protocol ← sdk
 2. **Phase 2 — Robots + movement**: GLB robot, animation states, waypoint nav, smooth walking, nameplates/status bubbles.
 3. **Phase 3 — Agent/task management**: core store + reducer, station router/occupancy, progress, completed/failed handling, unit tests.
 4. **Phase 4 — Events → visuals**: MockEventSource producing realistic random task lifecycles; overlay UI (roster, inspector, event feed, click-to-focus); WebSocketEventSource.
-5. **Phase 5 — Integration API + SDK**: Fastify server (projects, API keys, REST ingest, WS fan-out), `@agent-world/sdk` (Node + browser), React `<AgentWorld source=… />`.
+5. **Phase 5 — Integration API + SDK**: Fastify server (projects, API keys, REST ingest, WS fan-out), `@agent-viz/sdk` (Node + browser), React `<AgentWorld source=… />`.
 6. **Phase 6 — Dev dashboard + docs**: project/key management UI, live event inspector, theme editor, docs site/README guides.
 
 **This session's deliverable**: Phases 1–2 plus the minimum of 3–4 needed to see it alive (core store/reducer, mock source driving agents to stations). Stop after that for your review before Phase 3 hardening.

@@ -1,5 +1,5 @@
 import { useGLTF } from '@react-three/drei';
-import type { WorldConfig } from '@agent-world/protocol';
+import type { WorldConfig } from '@agent-viz/protocol';
 import { resolveModelUrl, type Theme } from '../themes/theme';
 
 /** Every model URL a world + theme can reference. */

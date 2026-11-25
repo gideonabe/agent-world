@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
-import type { AgentWorldStore } from '@agent-world/core';
+import type { AgentWorldStore } from '@agent-viz/core';
 import { describe, timeAgo } from './format';
 
 /** Latest notable events, newest first. */

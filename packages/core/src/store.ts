@@ -11,7 +11,7 @@ import {
   type TaskInput,
   type WorldConfig,
   type WorldSnapshot,
-} from '@agent-world/protocol';
+} from '@agent-viz/protocol';
 import { applyEvent } from './reducer';
 import { emptyState, type WorldState } from './types';
 import type { AgentEventSource } from './sources/types';

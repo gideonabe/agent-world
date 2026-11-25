@@ -1,5 +1,5 @@
 {
-  "name": "@agent-world/sdk",
+  "name": "@agent-viz/sdk",
   "version": "0.1.0",
   "description": "Tiny client for sending agent activity to an Agent World server (Node 18+ and browsers).",
   "license": "MIT",
@@ -15,10 +15,10 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@agent-world/protocol": "0.1.0"
+    "@agent-viz/protocol": "0.1.0"
   },
   "devDependencies": {
-    "@agent-world/server": "0.1.0",
-    "@agent-world/engine": "0.1.0"
+    "@agent-viz/server": "0.1.0",
+    "@agent-viz/engine": "0.1.0"
   }
 }

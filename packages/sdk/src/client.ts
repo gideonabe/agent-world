@@ -4,7 +4,7 @@ import type {
   AgentStatus,
   AgentWorldEvent,
   TaskInput,
-} from '@agent-world/protocol';
+} from '@agent-viz/protocol';
 
 export interface AgentWorldClientOptions {
   /** Server base URL, e.g. http://127.0.0.1:8787 */

@@ -1,5 +1,5 @@
 {
-  "name": "@agent-world/playground",
+  "name": "@agent-viz/playground",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@agent-world/core": "0.1.0",
-    "@agent-world/engine": "0.1.0",
-    "@agent-world/protocol": "0.1.0",
+    "@agent-viz/core": "0.1.0",
+    "@agent-viz/engine": "0.1.0",
+    "@agent-viz/protocol": "0.1.0",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
     "react": "~19.3.1",

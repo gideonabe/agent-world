@@ -31,7 +31,7 @@ const PACKAGES = [
     entries: { index: 'src/index.ts', cli: 'src/cli.ts' },
     platform: 'node',
     // world presets are plain data: inline them so the server doesn't pull in React/three
-    inline: ['@agent-world/engine'],
+    inline: ['@agent-viz/engine'],
     bin: { 'agent-world-server': './cli.js' },
     dashboard: true,
     // the Claude Code bridge, run with `agent-world-server claude-install`
@@ -44,21 +44,21 @@ const run = (cmd, args, cwd = root) => {
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(' ')} failed`);
 };
 
-const version = (name) => JSON.parse(fs.readFileSync(path.join(root, 'packages', name.replace('@agent-world/', ''), 'package.json'), 'utf8')).version;
+const version = (name) => JSON.parse(fs.readFileSync(path.join(root, 'packages', name.replace('@agent-viz/', ''), 'package.json'), 'utf8')).version;
 
 /** Workspace "0.1.0" deps become "^0.1.0" ranges in the published manifest. */
 function publishedDeps(deps = {}, drop = []) {
   const out = {};
   for (const [name, range] of Object.entries(deps)) {
     if (drop.includes(name)) continue;
-    out[name] = name.startsWith('@agent-world/') ? `^${version(name)}` : range;
+    out[name] = name.startsWith('@agent-viz/') ? `^${version(name)}` : range;
   }
   return Object.keys(out).length ? out : undefined;
 }
 
 if (process.argv.includes('--dashboard') || PACKAGES.some((p) => p.dashboard)) {
   console.log('\n▸ building dashboard');
-  run('npm', ['run', 'build', '-w', '@agent-world/dashboard']);
+  run('npm', ['run', 'build', '-w', '@agent-viz/dashboard']);
 }
 
 const releaseDir = path.join(root, 'release');

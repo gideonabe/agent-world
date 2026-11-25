@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import type { AgentStatus } from '@agent-world/protocol';
+import type { AgentStatus } from '@agent-viz/protocol';
 
 /** Status colours shared by in-world labels (apps can reuse them). */
 export const STATUS_COLORS: Record<AgentStatus, string> = {

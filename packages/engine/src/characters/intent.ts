@@ -1,5 +1,5 @@
-import type { AgentState, TaskOutcomeKind } from '@agent-world/core';
-import type { Task, Vec2, WorldConfig } from '@agent-world/protocol';
+import type { AgentState, TaskOutcomeKind } from '@agent-viz/core';
+import type { Task, Vec2, WorldConfig } from '@agent-viz/protocol';
 import type { NavGraph } from '../navigation/navGraph';
 import { hashString, stationToWorld } from '../math';
 import type { MotionIntent, Reaction } from './agentMotion';

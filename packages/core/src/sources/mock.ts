@@ -1,4 +1,4 @@
-import { createEnvelope, type AgentDescriptor, type AgentWorldEvent, type EventEnvelope } from '@agent-world/protocol';
+import { createEnvelope, type AgentDescriptor, type AgentWorldEvent, type EventEnvelope } from '@agent-viz/protocol';
 import type { AgentEventSource } from './types';
 
 export interface MockSourceOptions {

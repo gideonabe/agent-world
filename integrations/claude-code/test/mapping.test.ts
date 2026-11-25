@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createAgentWorldStore } from '@agent-world/core';
-import { meadowIsland } from '@agent-world/engine/presets';
-import { parseClientMessage } from '@agent-world/protocol';
+import { createAgentWorldStore } from '@agent-viz/core';
+import { meadowIsland } from '@agent-viz/engine/presets';
+import { parseClientMessage } from '@agent-viz/protocol';
 // @ts-expect-error plain JS module without type declarations
 import { describeTool, mapHook, phaseForTool } from '../mapping.mjs';
 

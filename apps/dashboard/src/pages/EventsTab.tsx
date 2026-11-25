@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { AgentWorldStore } from '@agent-world/core';
-import type { EventEnvelope } from '@agent-world/protocol';
+import type { AgentWorldStore } from '@agent-viz/core';
+import type { EventEnvelope } from '@agent-viz/protocol';
 import { Empty } from '../components/ui';
 
 const MAX = 500;

@@ -1,4 +1,4 @@
-import type { AgentWorldEvent, EventEnvelope, WorldSnapshot } from '@agent-world/protocol';
+import type { AgentWorldEvent, EventEnvelope, WorldSnapshot } from '@agent-viz/protocol';
 
 /** Extra hooks a source may use besides emitting events. */
 export interface SourceControls {

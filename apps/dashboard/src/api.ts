@@ -1,5 +1,5 @@
-import type { AgentWorldEvent } from '@agent-world/protocol';
-import type { WorldMetrics } from '@agent-world/core';
+import type { AgentWorldEvent } from '@agent-viz/protocol';
+import type { WorldMetrics } from '@agent-viz/core';
 
 export interface Connection {
   server: string;

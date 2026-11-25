@@ -39,7 +39,7 @@ export function IntegrateTab({ api, projectId }: { api: AdminApi; projectId: str
         <h3>2 · Use the SDK (Node or browser)</h3>
         <Code
           lang="ts"
-          code={`import { AgentWorldClient } from '@agent-world/sdk';
+          code={`import { AgentWorldClient } from '@agent-viz/sdk';
 
 const world = new AgentWorldClient({
   url: '${url}',
@@ -59,7 +59,7 @@ await world.close();`}
         <h3>3 · Embed the live island in a React app</h3>
         <Code
           lang="tsx"
-          code={`import { AgentWorldView } from '@agent-world/engine';
+          code={`import { AgentWorldView } from '@agent-viz/engine';
 
 <div style={{ height: 600 }}>
   <AgentWorldView server="${url}" project="${projectId}"${auth ? ` token="${R}"` : ''} />

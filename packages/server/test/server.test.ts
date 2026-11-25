@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-world/core';
-import { meadowIsland } from '@agent-world/engine/presets';
+import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-viz/core';
+import { meadowIsland } from '@agent-viz/engine/presets';
 import { createAgentWorldServer, type AgentWorldServer, type AgentWorldServerOptions } from '../src';
 
 const until = async (cond: () => boolean, ms = 3000) => {

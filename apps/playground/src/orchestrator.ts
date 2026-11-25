@@ -1,5 +1,5 @@
-import { generateTaskId, type AgentWorldStore, type BidirectionalEventSource, type MockEventSource } from '@agent-world/core';
-import type { AgentDestination } from '@agent-world/protocol';
+import { generateTaskId, type AgentWorldStore, type BidirectionalEventSource, type MockEventSource } from '@agent-viz/core';
+import type { AgentDestination } from '@agent-viz/protocol';
 
 /**
  * What the playground UI can ask agents to do. The UI doesn't care whether

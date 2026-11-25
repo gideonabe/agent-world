@@ -1,4 +1,4 @@
-import { isTerminalStatus, type EventEnvelope, type Task, type WorldConfig } from '@agent-world/protocol';
+import { isTerminalStatus, type EventEnvelope, type Task, type WorldConfig } from '@agent-viz/protocol';
 import { emptyStats, MAX_HISTORY, MAX_LOG, MAX_TASKS, type AgentState, type TaskOutcomeKind, type WorldState } from './types';
 import { allocateSlot, pickStation, releaseSlot } from './stationRouter';
 

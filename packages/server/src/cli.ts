@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { meadowIsland } from '@agent-world/engine/presets';
+import { meadowIsland } from '@agent-viz/engine/presets';
 import { createAgentWorldServer, DEFAULT_PROJECT } from './server';
 import { Registry, registryPath, type KeyRole } from './registry';
 

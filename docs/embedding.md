@@ -3,7 +3,7 @@
 ## Drop-in live view
 
 ```tsx
-import { AgentWorldView } from '@agent-world/engine';
+import { AgentWorldView } from '@agent-viz/engine';
 
 export function AgentsPanel() {
   return (
@@ -23,14 +23,14 @@ export function AgentsPanel() {
 `AgentWorldView` connects to the project over WebSocket. It loads the current snapshot, streams live updates, and reconnects on its
 own. It fills its parent, so give the parent a height.
 
-**Models.** The 3D models ship in `@agent-world/engine/assets`. Serve that folder so the files are reachable at `/models/…`, for
+**Models.** The 3D models ship in `@agent-viz/engine/assets`. Serve that folder so the files are reachable at `/models/…`, for
 example by pointing Vite's `publicDir` at it, or set `theme.assetBaseUrl` to wherever you host them.
 
 ## Your own UI around the same live state
 
 ```tsx
-import { AgentWorld, useRemoteWorld } from '@agent-world/engine';
-import { selectWorldMetrics } from '@agent-world/core';
+import { AgentWorld, useRemoteWorld } from '@agent-viz/engine';
+import { selectWorldMetrics } from '@agent-viz/core';
 import { useStore } from 'zustand';
 
 function Ops() {
@@ -50,8 +50,8 @@ function Ops() {
 The engine only needs a store. You can feed events in directly, for example in a demo, a test, or an app that already has the data:
 
 ```tsx
-import { createAgentWorldStore, MockEventSource } from '@agent-world/core';
-import { AgentWorld, meadowIsland } from '@agent-world/engine';
+import { createAgentWorldStore, MockEventSource } from '@agent-viz/core';
+import { AgentWorld, meadowIsland } from '@agent-viz/engine';
 
 const store = createAgentWorldStore(meadowIsland);
 store.getState().connect(new MockEventSource({ agentCount: 6 })); // or call store.getState().assignTask(...)

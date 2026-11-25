@@ -1,4 +1,4 @@
-import type { NavGraphDef, NavNode, Vec2 } from '@agent-world/protocol';
+import type { NavGraphDef, NavNode, Vec2 } from '@agent-viz/protocol';
 
 /** Waypoint graph with A* search. Pure: no three.js, fully testable. */
 export class NavGraph {

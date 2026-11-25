@@ -1,5 +1,5 @@
-import type { AgentWorldStoreState } from '@agent-world/core';
-import type { EventEnvelope } from '@agent-world/protocol';
+import type { AgentWorldStoreState } from '@agent-viz/core';
+import type { EventEnvelope } from '@agent-viz/protocol';
 
 export const STATUS_LABEL: Record<string, string> = {
   idle: 'Idle',

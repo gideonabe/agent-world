@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { selectAgentList, selectStationLoad, selectWorldMetrics, type AgentWorldStore } from '@agent-world/core';
-import { AgentWorld, meadowTheme, STATUS_COLORS, useRemoteWorld } from '@agent-world/engine';
+import { selectAgentList, selectStationLoad, selectWorldMetrics, type AgentWorldStore } from '@agent-viz/core';
+import { AgentWorld, meadowTheme, STATUS_COLORS, useRemoteWorld } from '@agent-viz/engine';
 import type { AdminApi, ProjectInfo } from '../api';
 import { href, navigate } from '../router';
 import { ErrorNote, pct, Stat } from '../components/ui';

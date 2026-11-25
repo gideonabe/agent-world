@@ -1,4 +1,4 @@
-import type { StationDef, WorldConfig } from '@agent-world/protocol';
+import type { StationDef, WorldConfig } from '@agent-viz/protocol';
 
 /**
  * Picks the best station for a task kind:

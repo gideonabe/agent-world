@@ -1,10 +1,10 @@
-# @agent-world/sdk
+# @agent-viz/sdk
 
 The SDK sends your agents' activity to an Agent World server. It works in Node 18+ and in browsers, and its only
 dependency is the protocol types.
 
 ```ts
-import { AgentWorldClient } from '@agent-world/sdk';
+import { AgentWorldClient } from '@agent-viz/sdk';
 
 const world = new AgentWorldClient({
   url: 'http://127.0.0.1:8787',

@@ -1,7 +1,7 @@
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { selectWorldMetrics, type AgentWorldStore, type ConnectionStatus } from '@agent-world/core';
-import { STATUS_COLORS } from '@agent-world/engine';
+import { selectWorldMetrics, type AgentWorldStore, type ConnectionStatus } from '@agent-viz/core';
+import { STATUS_COLORS } from '@agent-viz/engine';
 
 interface Props {
   store: AgentWorldStore;

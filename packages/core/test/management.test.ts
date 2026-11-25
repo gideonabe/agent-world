@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createEnvelope, type AgentWorldEvent, type WorldConfig } from '@agent-world/protocol';
+import { createEnvelope, type AgentWorldEvent, type WorldConfig } from '@agent-viz/protocol';
 import {
   applyEvent,
   createAgentWorldStore,

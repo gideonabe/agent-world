@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { AgentWorldStore } from '@agent-world/core';
+import type { AgentWorldStore } from '@agent-viz/core';
 import type { AdminApi } from '../api';
 import { ErrorNote } from '../components/ui';
 

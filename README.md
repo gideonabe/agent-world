@@ -57,11 +57,11 @@ console at http://localhost:8787. Put it behind an HTTPS reverse proxy before ex
 
 | Package | Purpose | Depends on |
 |---|---|---|
-| `@agent-world/protocol` | Standard types and zod schemas: agents, tasks, events, world config | zod |
-| `@agent-world/core` | Framework-agnostic store, pure reducer, station router, event sources (mock) | protocol, zustand |
-| `@agent-world/engine` | React Three Fiber renderer: island, stations, robots, camera, themes | core, protocol |
-| `@agent-world/server` | Authoritative hub: projects, API keys, persistence, REST + WebSocket, rate limits, simulator ([README](packages/server/README.md)) | core, protocol, ws |
-| `@agent-world/sdk` | Client for any app: `agent().run(...)`, batching, retries ([README](packages/sdk/README.md)) | protocol |
+| `@agent-viz/protocol` | Standard types and zod schemas: agents, tasks, events, world config | zod |
+| `@agent-viz/core` | Framework-agnostic store, pure reducer, station router, event sources (mock) | protocol, zustand |
+| `@agent-viz/engine` | React Three Fiber renderer: island, stations, robots, camera, themes | core, protocol |
+| `@agent-viz/server` | Authoritative hub: projects, API keys, persistence, REST + WebSocket, rate limits, simulator ([README](packages/server/README.md)) | core, protocol, ws |
+| `@agent-viz/sdk` | Client for any app: `agent().run(...)`, batching, retries ([README](packages/sdk/README.md)) | protocol |
 | `apps/dashboard` | Developer console: projects, keys, live island, event inspector, test events, snippets, docs (the server hosts it at `/`) | engine, core |
 | `apps/playground` | Demo app: full-screen world and overlay UI, using the local simulator or a live server | all |
 | `integrations/claude-code` | Claude Code hooks bridge: your sessions as robots ([README](integrations/claude-code/README.md)) | – |
@@ -71,13 +71,13 @@ console at http://localhost:8787. Put it behind an HTTPS reverse proxy before ex
 `npm run build:packages` bundles each library to ESM with esbuild, emits `.d.ts` files, writes a publish manifest, and packs a
 tarball into `release/`. In the workspace, packages still import TypeScript source; only the `dist/` folders are published.
 
-- `@agent-world/engine` ships the 3D models under `assets/`. Serve them at `/models/`, or set `theme.assetBaseUrl`.
-- `@agent-world/server` inlines the world presets, so it doesn't pull in React or three. It ships the built console plus an
+- `@agent-viz/engine` ships the 3D models under `assets/`. Serve them at `/models/`, or set `theme.assetBaseUrl`.
+- `@agent-viz/server` inlines the world presets, so it doesn't pull in React or three. It ships the built console plus an
   `agent-world-server` bin.
 - `npm run verify:packages` installs the tarballs into an empty project, starts the server from its bin, runs the SDK against it,
   and checks types, assets, and the console.
 
-To publish, run `npm publish --access public` in each `packages/*/dist`.
+To publish, run `npm run publish:packages` in a terminal (npm asks you to confirm with 2FA). It publishes in dependency order and skips versions that are already on npm.
 
 ## How it works
 
@@ -160,8 +160,8 @@ objects; when you use one of those with `useStore`, wrap it in `useShallow` and 
 ## Embedding (today)
 
 ```tsx
-import { createAgentWorldStore } from '@agent-world/core';
-import { AgentWorld, meadowIsland } from '@agent-world/engine';
+import { createAgentWorldStore } from '@agent-viz/core';
+import { AgentWorld, meadowIsland } from '@agent-viz/engine';
 
 const store = createAgentWorldStore(meadowIsland /*, { lifecycle: { settleMs, staleMs }, onEvent } */);
 store.getState().registerAgent({ id: 'a1', name: 'Ada', kind: 'research' });
@@ -258,7 +258,7 @@ pooled `InstancedMesh`. Turn them off with `<AgentWorld effects={false} />`.
 2. ✅ Robot characters, navigation, animation state machine
 3. ✅ Agent/task management: backlogs with priority, cancel/retry, stall detection, settling, destinations, history, metrics, commands, and selectors
 4. ✅ Events to visuals: WebSocket source with reconnect and snapshot sync, relay server, event-driven effects, live mode in the playground
-5. ✅ Integration API and SDK: projects, API keys (hashed, write/read/admin), persistence, rate limits, a management CLI and HTTP API, `@agent-world/sdk`, and `<AgentWorldView>` / `useRemoteWorld`
+5. ✅ Integration API and SDK: projects, API keys (hashed, write/read/admin), persistence, rate limits, a management CLI and HTTP API, `@agent-viz/sdk`, and `<AgentWorldView>` / `useRemoteWorld`
 6. ✅ Developer console (projects, keys, live island, event inspector, test events, snippets, rendered docs, full-screen view) hosted by the server, docs in `docs/`, and publish-ready npm packages verified by a clean-install test
 
 See `docs/ARCHITECTURE.md` for the full design.

@@ -13,7 +13,7 @@
 // Existing settings and hooks are preserved; a timestamped backup is written first.
 //
 // Also available from the published server package:
-//   npx @agent-world/server claude-install [--project <dir> | --user] [...]
+//   npx @agent-viz/server claude-install [--project <dir> | --user] [...]
 // When run from an installed package (node_modules or the npx cache), the hook scripts are
 // copied to ~/.agent-world/claude-code first, so the hooks keep working after npx cleans up.
 import fs from 'node:fs';
@@ -129,7 +129,7 @@ console.log(`${has('--uninstall') ? 'Removed Agent World hooks from' : 'Installe
 if (!has('--uninstall')) {
   const proj = val('--world-project') ?? 'default';
   const base = (val('--url') ?? 'http://127.0.0.1:8787').replace(/\/+$/, '');
-  console.log(`Start the server with:  ${installedFromPackage ? 'npx @agent-world/server' : 'npm run server:empty   (in the agent-world folder)'}`);
+  console.log(`Start the server with:  ${installedFromPackage ? 'npx @agent-viz/server' : 'npm run server:empty   (in the agent-world folder)'}`);
   console.log(`Watch it at:            ${base}/#/p/${encodeURIComponent(proj)}`);
   if (val('--key')) console.log('Note: the API key is stored in that settings file. Keep it out of version control.');
   console.log('Restart that Claude Code session (or check /hooks) so it picks up the new hooks.');

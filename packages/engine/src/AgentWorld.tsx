@@ -1,7 +1,7 @@
 import { Suspense, useMemo, type CSSProperties } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr, Stats } from '@react-three/drei';
-import type { AgentWorldStore } from '@agent-world/core';
+import type { AgentWorldStore } from '@agent-viz/core';
 import { EngineProvider } from './context';
 import { SelectionContext } from './selection';
 import { meadowTheme } from './themes/meadow';

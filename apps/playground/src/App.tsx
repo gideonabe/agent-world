@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { createAgentWorldStore, MockEventSource, WebSocketEventSource, type ConnectionStatus } from '@agent-world/core';
-import { AgentWorld, meadowIsland, meadowTheme, remoteSocketUrl } from '@agent-world/engine';
+import { createAgentWorldStore, MockEventSource, WebSocketEventSource, type ConnectionStatus } from '@agent-viz/core';
+import { AgentWorld, meadowIsland, meadowTheme, remoteSocketUrl } from '@agent-viz/engine';
 import { TopBar } from './ui/TopBar';
 import { Roster } from './ui/Roster';
 import { Inspector } from './ui/Inspector';

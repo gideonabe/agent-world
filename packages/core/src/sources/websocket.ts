@@ -3,7 +3,7 @@ import {
   type AgentWorldEvent,
   type ClientMessage,
   type EventEnvelope,
-} from '@agent-world/protocol';
+} from '@agent-viz/protocol';
 import type { BidirectionalEventSource, ConnectionStatus, SourceControls } from './types';
 
 /** Minimal WebSocket surface (browser WebSocket, Node 22+ global, or `ws`). */

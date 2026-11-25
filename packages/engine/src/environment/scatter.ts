@@ -1,4 +1,4 @@
-import type { Vec2, WorldConfig } from '@agent-world/protocol';
+import type { Vec2, WorldConfig } from '@agent-viz/protocol';
 import { NavGraph, distToSegment } from '../navigation/navGraph';
 import { mulberry32, shoreNoise, weightedPick } from '../math';
 import type { DecorDef } from '../themes/theme';

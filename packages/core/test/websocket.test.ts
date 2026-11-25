@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createEnvelope, parseClientMessage, parseServerMessage, type WorldConfig } from '@agent-world/protocol';
+import { createEnvelope, parseClientMessage, parseServerMessage, type WorldConfig } from '@agent-viz/protocol';
 import { createAgentWorldStore, WebSocketEventSource, type ConnectionStatus, type WebSocketLike } from '../src';
 
 const world: WorldConfig = {

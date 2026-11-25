@@ -1,4 +1,4 @@
-import type { StationDef, WorldConfig } from '@agent-world/protocol';
+import type { StationDef, WorldConfig } from '@agent-viz/protocol';
 
 /**
  * Default world: a round island with a central plaza and four workstations.

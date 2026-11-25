@@ -32,7 +32,7 @@ Then restart that Claude Code session, or run `/hooks` in it to confirm the hook
 the console under the `default` project.
 
 The same commands ship in the server package, so once it's installed from npm you don't need this repo:
-`npx @agent-world/server claude-install` (defaults to the current folder). That copies the hook scripts to
+`npx @agent-viz/server claude-install` (defaults to the current folder). That copies the hook scripts to
 `~/.agent-world/claude-code` so they keep working after npx cleans up.
 
 ### Reporting into a project on a secured server

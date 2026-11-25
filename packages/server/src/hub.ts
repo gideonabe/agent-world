@@ -7,7 +7,7 @@ import {
   type EventEnvelope,
   type ServerMessage,
   type WorldConfig,
-} from '@agent-world/protocol';
+} from '@agent-viz/protocol';
 import {
   createAgentWorldStore,
   MockEventSource,
@@ -15,7 +15,7 @@ import {
   type AgentWorldStore,
   type LifecycleOptions,
   type MockSourceOptions,
-} from '@agent-world/core';
+} from '@agent-viz/core';
 import { SnapshotStore } from './persistence';
 
 export interface IngestResult {

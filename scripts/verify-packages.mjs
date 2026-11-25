@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const release = path.join(root, 'release');
-const tgz = (name) => path.join(release, fs.readdirSync(release).find((f) => f.startsWith(`agent-world-${name}-`)));
+const tgz = (name) => path.join(release, fs.readdirSync(release).find((f) => f.startsWith(`agent-viz-${name}-`)));
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aw-verify-'));
 const ok = (msg) => console.log(`  ✓ ${msg}`);
 const fail = (msg) => {
@@ -29,7 +29,7 @@ const install = spawnSync('npm', ['install', '--no-audit', '--no-fund', tgz('pro
 if (install.status !== 0) throw new Error('npm install of tarballs failed');
 ok('installed protocol, core, sdk, server from tarballs');
 
-const mod = (p) => path.join(dir, 'node_modules', '@agent-world', p);
+const mod = (p) => path.join(dir, 'node_modules', '@agent-viz', p);
 for (const p of ['protocol', 'core', 'sdk', 'server']) {
   fs.existsSync(path.join(mod(p), 'types', 'index.d.ts')) ? ok(`${p}: types present`) : fail(`${p}: missing types`);
 }
@@ -61,7 +61,7 @@ try {
 
   fs.writeFileSync(
     path.join(dir, 'use-sdk.mjs'),
-    `import { AgentWorldClient } from '@agent-world/sdk';
+    `import { AgentWorldClient } from '@agent-viz/sdk';
 const world = new AgentWorldClient({ url: '${base}', project: 'consumer' });
 const a = world.agent({ id: 'pkg-bot', name: 'Pkg Bot', kind: 'coding' });
 await a.run('Verify the packages', (t) => { t.progress(0.5, 'Halfway', 'research'); });
@@ -97,7 +97,7 @@ console.log(JSON.stringify({ status: snap.state.agents['pkg-bot']?.stats, task: 
       : fail(`claude hook did not reach the server: ${hook.stderr}`);
   } else fail(`claude-install failed: ${ci.stdout}${ci.stderr}`);
 
-  const core = spawnSync(process.execPath, ['-e', "import('@agent-world/core').then(m => console.log(typeof m.createAgentWorldStore))"], { cwd: dir });
+  const core = spawnSync(process.execPath, ['-e', "import('@agent-viz/core').then(m => console.log(typeof m.createAgentWorldStore))"], { cwd: dir });
   core.stdout.toString().includes('function') ? ok('core imports in plain Node') : fail(`core import failed ${core.stderr}`);
 } finally {
   server.kill();

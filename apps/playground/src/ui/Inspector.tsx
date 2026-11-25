@@ -9,9 +9,9 @@ import {
   selectRoutableKinds,
   taskDurationMs,
   type AgentWorldStore,
-} from '@agent-world/core';
-import type { Task } from '@agent-world/protocol';
-import { meadowTheme, STATUS_COLORS } from '@agent-world/engine';
+} from '@agent-viz/core';
+import type { Task } from '@agent-viz/protocol';
+import { meadowTheme, STATUS_COLORS } from '@agent-viz/engine';
 import { STATUS_LABEL, formatDuration } from './format';
 import type { Orchestrator } from '../orchestrator';
 

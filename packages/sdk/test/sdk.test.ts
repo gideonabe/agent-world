@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { meadowIsland } from '@agent-world/engine/presets';
-import { createAgentWorldServer, type AgentWorldServer } from '@agent-world/server';
+import { meadowIsland } from '@agent-viz/engine/presets';
+import { createAgentWorldServer, type AgentWorldServer } from '@agent-viz/server';
 import { AgentWorldClient, type AgentWorldError } from '../src';
 
 let server: AgentWorldServer | undefined;

@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { useStore } from 'zustand';
 import * as THREE from 'three';
-import type { StationDef } from '@agent-world/protocol';
+import type { StationDef } from '@agent-viz/protocol';
 import { useEngine } from '../context';
 import { Prop } from '../assets/Model';
 import { labelStyles } from '../ui/styles';

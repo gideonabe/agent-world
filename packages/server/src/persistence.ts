@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { WorldSnapshot } from '@agent-world/protocol';
+import type { WorldSnapshot } from '@agent-viz/protocol';
 
 /** Write via temp file + rename so a crash never leaves a half-written file. */
 export function writeJsonAtomic(file: string, data: unknown) {
