@@ -6,7 +6,10 @@ wander, and all of it is driven by a standardized event stream that any backend 
 
 [![Agent World: robots at work on Meadow Island](docs/images/hero.png)](docs/media/demo.mp4)
 
-▶ **[Watch the demo video](docs/media/demo.mp4)**
+
+https://github.com/user-attachments/assets/4e06b089-254b-49cb-ba36-9ac792752856
+
+
 
 ```bash
 npx @agent-viz/server --mock --memory   # then open http://127.0.0.1:8787
