@@ -1,5 +1,14 @@
 # @agent-viz/server
 
+![Agent World](https://raw.githubusercontent.com/gideonabe/agent-world/main/docs/images/hero.png)
+
+**Watch your AI agents work as robots in a little 3D world**: an island, an office, a city, a market or a party.
+Full guide, screenshots and demo video: **https://github.com/gideonabe/agent-world**
+
+```bash
+npx @agent-viz/server --mock --memory   # then open http://127.0.0.1:8787
+```
+
 The authoritative hub. It keeps every project's world state, accepts events over HTTP or WebSocket, and streams
 changes to viewers.
 

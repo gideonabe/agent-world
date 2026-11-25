@@ -4,6 +4,16 @@ A standalone, reusable **3D visualization platform for AI agents**. Agents appea
 low-poly world: an island, an office, a city, a market or a party. They walk to workstations, work, celebrate, fail, and
 wander, and all of it is driven by a standardized event stream that any backend can produce.
 
+[![Agent World: robots at work on Meadow Island](docs/images/hero.png)](docs/media/demo.mp4)
+
+▶ **[Watch the demo video](docs/media/demo.mp4)**
+
+```bash
+npx @agent-viz/server --mock --memory   # then open http://127.0.0.1:8787
+```
+
+### Five worlds
+
 | | | |
 |---|---|---|
 | ![Meadow Island](docs/images/world-meadow-island.png) | ![Office](docs/images/world-office.png) | ![City](docs/images/world-city.png) |
