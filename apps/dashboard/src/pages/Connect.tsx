@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminApi, type Connection } from '../api';
 import { ErrorNote } from '../components/ui';
 
@@ -12,6 +12,25 @@ export function ConnectPage({ onConnect }: { onConnect: (c: Connection, remember
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [needsToken, setNeedsToken] = useState<boolean | undefined>();
+
+  // Served by a local dev server (no API keys)? Then there's nothing to fill in: connect straight away.
+  useEffect(() => {
+    if (!location.protocol.startsWith('http') || location.port === '5180') return;
+    const conn = { server: location.origin, token: '' };
+    let cancelled = false;
+    new AdminApi(conn)
+      .health()
+      .then((h) => {
+        if (!cancelled && !h.auth) onConnect(conn, false);
+        else if (!cancelled) setNeedsToken(h.auth);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // run once on mount (onConnect is a new function on every render of the parent)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +61,7 @@ export function ConnectPage({ onConnect }: { onConnect: (c: Connection, remember
             <small>Developer console</small>
           </span>
         </div>
-        <p className="muted">Connect to an Agent World server to manage projects, keys and live islands.</p>
+        <p className="muted">Connect to an Agent World server to manage projects, keys and live worlds.</p>
         <label>
           Server URL
           <input className="input" value={server} onChange={(e) => setServer(e.target.value)} placeholder="http://127.0.0.1:8787" required />
@@ -66,7 +85,7 @@ export function ConnectPage({ onConnect }: { onConnect: (c: Connection, remember
           {busy ? 'Connecting…' : 'Connect'}
         </button>
         <p className="muted small">
-          No server yet? Run <code>npm run server:empty</code> in the agent-world folder. Or read the{' '}
+          No server yet? Run <code>npx @agent-viz/server</code>. Or read the{' '}
           <a href="#/docs/getting-started">getting started guide</a>.
         </p>
       </form>

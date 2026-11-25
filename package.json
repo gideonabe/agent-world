@@ -1,7 +1,7 @@
 {
   "name": "agent-world",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Standalone, reusable 3D visualization platform for AI agents.",
   "license": "MIT",
   "repository": {

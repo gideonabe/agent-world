@@ -9,6 +9,7 @@ import type { Theme } from './themes/theme';
 import { Decor } from './environment/Decor';
 import { Lighting } from './environment/Sky';
 import { getWorldStyle } from './worlds';
+import { useAmbientSound } from './sound';
 import { Stations } from './stations/Station';
 import { Agents } from './characters/Agents';
 import { CameraRig } from './camera/CameraRig';
@@ -26,6 +27,13 @@ export interface AgentWorldProps {
   effects?: boolean;
   /** Show an FPS meter (dev). */
   stats?: boolean;
+  /**
+   * Play the world's ambient sound (traffic, market chatter, party music, ...). Off by default; browsers only
+   * allow it after the viewer interacts with the page, so turn it on from a button click.
+   */
+  sound?: boolean;
+  /** Sound volume, 0..1 (default 0.35). */
+  volume?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -34,8 +42,9 @@ export interface AgentWorldProps {
  * The embeddable 3D world. Everything it shows comes from the store
  * (agents/tasks) and the world config (layout) — nothing is hardcoded.
  */
-export function AgentWorld({ store, theme: themeProp, selectedAgentId = null, onSelectAgent, effects = true, stats, className, style }: AgentWorldProps) {
+export function AgentWorld({ store, theme: themeProp, selectedAgentId = null, onSelectAgent, effects = true, stats, sound = false, volume, className, style }: AgentWorldProps) {
   const world = useStore(store, (s) => s.world);
+  useAmbientSound(world.id, sound, volume);
   const worldStyle = getWorldStyle(world.id);
   const theme = themeProp ?? worldStyle.theme;
   const { Scene } = worldStyle;

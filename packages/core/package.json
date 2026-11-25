@@ -1,6 +1,6 @@
 {
   "name": "@agent-viz/core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Framework-agnostic, event-driven agent & task state for Agent World.",
   "license": "MIT",
   "repository": {
@@ -15,7 +15,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@agent-viz/protocol": "0.1.2",
+    "@agent-viz/protocol": "0.2.0",
     "zustand": "^5.1.0"
   }
 }

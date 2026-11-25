@@ -13,7 +13,7 @@ import { useSelection } from '../selection';
 
 const heightCache = new WeakMap<THREE.Object3D, number>();
 
-function modelHeight(scene: THREE.Object3D) {
+export function modelHeight(scene: THREE.Object3D) {
   let h = heightCache.get(scene);
   if (h === undefined) {
     scene.updateMatrixWorld(true);
@@ -24,7 +24,7 @@ function modelHeight(scene: THREE.Object3D) {
   return h;
 }
 
-function clipName(theme: Theme, key: ClipKey) {
+export function clipName(theme: Theme, key: ClipKey) {
   const c = theme.robot.clips;
   if (key.startsWith('work:')) {
     const k = key.slice(5);

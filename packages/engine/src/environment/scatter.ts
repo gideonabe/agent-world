@@ -21,7 +21,7 @@ export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: num
   const rnd = mulberry32(world.island.seed);
   const nav = new NavGraph(world.navigation);
   const edges = nav.edges;
-  const R = world.island.radius;
+  const R = world.island.radius - (world.island.decorInset ?? 0);
   const placed: { p: Vec2; r: number }[] = [];
   const out: DecorItem[] = [];
 

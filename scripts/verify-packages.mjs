@@ -39,6 +39,11 @@ fs.existsSync(path.join(mod('server'), 'dashboard', 'index.html')) ? ok('server:
 // relative path: some Windows tar builds treat "C:" as a remote host
 const list = spawnSync('tar', ['-tzf', path.basename(tgz('engine'))], { cwd: release }).stdout?.toString() ?? '';
 if (!list) fail('could not list the engine tarball');
+// size budget: the server ships the console and the engine ships the models
+for (const name of ['engine', 'server']) {
+  const kb = fs.statSync(tgz(name)).size / 1024;
+  kb < 3072 ? ok(`${name} tarball is ${kb.toFixed(0)} kB (budget 3 MB)`) : fail(`${name} tarball is ${kb.toFixed(0)} kB, over the 3 MB budget`);
+}
 ['package/index.js', 'package/presets.js', 'package/types/index.d.ts', 'package/assets/models/robot/RobotExpressive.glb'].forEach((f) =>
   list.includes(f) ? ok(`engine tarball has ${f.replace('package/', '')}`) : fail(`engine tarball missing ${f}`),
 );
@@ -72,6 +77,12 @@ console.log(JSON.stringify({ status: snap.state.agents['pkg-bot']?.stats, task: 
   const r = spawnSync(process.execPath, ['use-sdk.mjs'], { cwd: dir });
   const out = r.stdout.toString().trim();
   out.includes('"task":"completed"') && out.includes('"completed":1') ? ok(`SDK → server round trip: ${out}`) : fail(`SDK round trip failed: ${out} ${r.stderr}`);
+
+  const worlds = (await (await fetch(`${base}/v1/worlds`)).json()).worlds.map((w) => w.id);
+  worlds.length === 5 && worlds.includes('party') ? ok(`5 worlds available: ${worlds.join(', ')}`) : fail(`expected 5 worlds, got ${worlds}`);
+  const sw = await fetch(`${base}/v1/projects/consumer`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ worldId: 'city' }) });
+  const moved = (await (await fetch(`${base}/v1/projects/consumer/snapshot`)).json()).worldId;
+  sw.ok && moved === 'city' ? ok('project switched to the city world') : fail(`world switch failed (${sw.status}, ${moved})`);
 
   const html = await (await fetch(`${base}/`)).text();
   html.includes('<div id="root">') ? ok('console served at /') : fail('console not served');

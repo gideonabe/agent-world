@@ -21,7 +21,11 @@ export function AgentsPanel() {
 ```
 
 `AgentWorldView` connects to the project over WebSocket. It loads the current snapshot, streams live updates, and reconnects on its
-own. It fills its parent, so give the parent a height.
+own. It shows the project's world (Office, City, …) and follows when someone switches it. It fills its parent, so give the parent a
+height.
+
+**Sound.** Add `sound` (and optionally `volume`, 0..1) to play the world's ambient sound. Browsers only allow audio after the viewer
+interacts with the page, so turn it on from a button click.
 
 **Models.** The 3D models ship in `@agent-viz/engine/assets`. Serve that folder so the files are reachable at `/models/…`, for
 example by pointing Vite's `publicDir` at it, or set `theme.assetBaseUrl` to wherever you host them.
@@ -51,9 +55,9 @@ The engine only needs a store. You can feed events in directly, for example in a
 
 ```tsx
 import { createAgentWorldStore, MockEventSource } from '@agent-viz/core';
-import { AgentWorld, meadowIsland } from '@agent-viz/engine';
+import { AgentWorld, city } from '@agent-viz/engine';
 
-const store = createAgentWorldStore(meadowIsland);
+const store = createAgentWorldStore(city); // or meadowIsland, office, market, party
 store.getState().connect(new MockEventSource({ agentCount: 6 })); // or call store.getState().assignTask(...)
 
 <AgentWorld store={store} />;

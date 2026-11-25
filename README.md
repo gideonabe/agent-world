@@ -1,8 +1,15 @@
 # Agent World
 
-A standalone, reusable **3D visualization platform for AI agents**. Agents appear as animated robots
-on a miniature low-poly island. They walk to workstations, work, celebrate, fail, and wander, and all
-of it is driven by a standardized event stream that any backend can produce.
+A standalone, reusable **3D visualization platform for AI agents**. Agents appear as animated robots in a miniature
+low-poly world: an island, an office, a city, a market or a party. They walk to workstations, work, celebrate, fail, and
+wander, and all of it is driven by a standardized event stream that any backend can produce.
+
+| | | |
+|---|---|---|
+| ![Meadow Island](docs/images/world-meadow-island.png) | ![Office](docs/images/world-office.png) | ![City](docs/images/world-city.png) |
+| **Meadow Island** | **Office** | **City**: traffic, day and night |
+| ![Market](docs/images/world-market.png) | ![Party](docs/images/world-party.png) | |
+| **Market** | **Party**: dance floor and DJ booth | |
 
 ## Quick start
 
@@ -17,6 +24,14 @@ events, send test events, copy integration snippets, and read the docs. Click **
 robot get to work.
 
 Want to see it busy first? `npx @agent-viz/server --mock --memory` fills the `default` project with simulated agents.
+
+### Pick a world
+
+Each project lives in one of five worlds: **Meadow Island**, **Office**, **City**, **Market** or **Party**. Choose one when you
+create a project, or click **Change world** on the project page; everyone watching switches with you and the robots walk to the
+matching spots. Each world has its own background life (coworkers, traffic, shoppers, dancers) and optional ambient sound
+(the 🔈 button). From the CLI: `npx @agent-viz/server projects create my-app --world city`. More in
+[docs/customization.md](docs/customization.md).
 
 ### Watch your Claude Code sessions
 
@@ -285,8 +300,9 @@ pooled `InstancedMesh`. Turn them off with `<AgentWorld effects={false} />`.
 
 ## Customization
 
-* **New world:** copy `packages/engine/src/presets/meadowIsland.ts` and change the stations, slots, nav nodes/edges, and props.
-* **New theme:** copy `themes/meadow.ts` and change the palette, `materialColors`, robot model/clip mapping, and decor pools.
+* **Built-in worlds:** Meadow Island, Office, City, Market and Party (`allWorlds` in `@agent-viz/engine`). Switch a project with `PATCH /v1/projects/:id { worldId }` or the console.
+* **New world:** copy one of `packages/engine/src/presets/*.ts` and change the stations, slots, nav nodes/edges, and props (GLB models or built-in `shape/…` props), then `registerWorldStyle(id, { theme, Scene })`.
+* **New theme:** copy `themes/meadow.ts` and change the palette, lighting, time of day, `materialColors`, robot model/clip mapping, and decor pools.
 * **Per agent:** set `appearance: { color, model, scale }` on the descriptor.
 * **Work animation per station:** use `workAnimation` (a key into `theme.robot.clips.work`). Set `workStyle: 'roaming'` to make agents move between `roamNodes` while they work.
 
@@ -298,6 +314,7 @@ pooled `InstancedMesh`. Turn them off with `<AgentWorld effects={false} />`.
 4. ✅ Events to visuals: WebSocket source with reconnect and snapshot sync, relay server, event-driven effects, live mode in the playground
 5. ✅ Integration API and SDK: projects, API keys (hashed, write/read/admin), persistence, rate limits, a management CLI and HTTP API, `@agent-viz/sdk`, and `<AgentWorldView>` / `useRemoteWorld`
 6. ✅ Developer console (projects, keys, live island, event inspector, test events, snippets, rendered docs, full-screen view) hosted by the server, docs in `docs/`, and publish-ready npm packages verified by a clean-install test
+7. ✅ Five worlds (Meadow Island, Office, City, Market, Party) switchable per project while live, with background crowds, traffic, day/night lighting, party lights and synthesized ambient sound
 
 See `docs/ARCHITECTURE.md` for the full design.
 

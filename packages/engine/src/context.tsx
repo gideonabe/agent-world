@@ -13,6 +13,11 @@ export interface EngineRuntime {
   nav: NavGraph;
   /** Live motion state per agent, shared for camera follow + crowd separation. */
   motions: Map<string, AgentMotion>;
+  /**
+   * Shared, per-frame ambience values (mutated in place, read inside useFrame):
+   * `night` goes from 0 (day) to 1 (night) for worlds with a day/night cycle, and `beat` pulses 0..1 to the party music.
+   */
+  ambience: { night: number; beat: number };
 }
 
 const EngineContext = createContext<EngineRuntime | null>(null);
@@ -29,7 +34,7 @@ export function EngineProvider({
   // follow live world switches (e.g. a project moved from Meadow Island to the Office)
   const world = useStore(store, (s) => s.world);
   const value = useMemo<EngineRuntime>(
-    () => ({ store, world, theme, nav: new NavGraph(world.navigation), motions: new Map() }),
+    () => ({ store, world, theme, nav: new NavGraph(world.navigation), motions: new Map(), ambience: { night: 0, beat: 0 } }),
     [store, world, theme],
   );
   return <EngineContext.Provider value={value}>{children}</EngineContext.Provider>;

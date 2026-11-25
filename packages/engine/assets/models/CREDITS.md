@@ -10,5 +10,9 @@ All models are released under **CC0 1.0 (public domain)**. Attribution isn't req
 
 The original downloads (including full license files) are in `assets-src/_download/`.
 
+City, market and party props (`shape/…`: buildings, cars, stalls, the disco ball, …) are drawn in code in
+`packages/engine/src/assets/shapes.tsx`, and the ambient sound is synthesized in `packages/engine/src/sound.ts`; neither uses
+external files.
+
 Note: Kenney Nature Kit materials export with `metallicFactor: 1`. The engine resets
 metalness on load (`prepareMaterials` in `packages/engine/src/assets/Model.tsx`).

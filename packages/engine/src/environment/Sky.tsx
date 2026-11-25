@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEngine } from '../context';
 import { mulberry32 } from '../math';
@@ -11,12 +11,48 @@ export function Lighting() {
   const R = world.island.radius;
   const l = theme.lighting ?? {};
   const sun = useRef<THREE.DirectionalLight>(null);
+  const hemi = useRef<THREE.HemisphereLight>(null);
+  const amb = useRef<THREE.AmbientLight>(null);
+  const scene = useThree((s) => s.scene);
+  const { ambience } = useEngine();
+  const time = theme.time;
+  const colors = useMemo(
+    () => ({
+      bg: new THREE.Color(p.background),
+      fog: new THREE.Color(p.fog),
+      night: new THREE.Color(time?.nightSky ?? '#141a33'),
+      sunDay: new THREE.Color(p.sun),
+      sunNight: new THREE.Color('#8fa6ff'),
+    }),
+    [p.background, p.fog, p.sun, time?.nightSky],
+  );
+
+  // time of day: fixed (party) or a slow day → night loop (city)
+  useFrame(({ clock }) => {
+    let n = time?.night ?? 0;
+    if (time?.cycleSeconds) {
+      const phase = (clock.elapsedTime / time.cycleSeconds) % 1;
+      // mostly day, a quick dusk, a stretch of night, then dawn
+      n = THREE.MathUtils.smoothstep(Math.cos(phase * Math.PI * 2) * -1, -0.25, 0.45);
+    }
+    ambience.night = n;
+    if (!time) return;
+    if (sun.current) {
+      sun.current.intensity = (l.sun ?? 2.4) * (1 - 0.82 * n);
+      sun.current.color.copy(colors.sunDay).lerp(colors.sunNight, n);
+    }
+    if (hemi.current) hemi.current.intensity = (l.hemi ?? 1.25) * (1 - 0.55 * n);
+    if (amb.current) amb.current.intensity = (l.ambient ?? 0.25) * (1 - 0.3 * n);
+    if (scene.background instanceof THREE.Color) scene.background.copy(colors.bg).lerp(colors.night, n);
+    if (scene.fog) scene.fog.color.copy(colors.fog).lerp(colors.night, n);
+  });
+
   return (
     <>
       <color attach="background" args={[p.background]} />
       <fog attach="fog" args={[p.fog, R * (l.fogNear ?? 3.2), R * (l.fogFar ?? 6.5)]} />
-      <hemisphereLight args={[p.hemiSky, p.hemiGround, l.hemi ?? 1.25]} />
-      <ambientLight intensity={l.ambient ?? 0.25} />
+      <hemisphereLight ref={hemi} args={[p.hemiSky, p.hemiGround, l.hemi ?? 1.25]} />
+      <ambientLight ref={amb} intensity={l.ambient ?? 0.25} />
       <directionalLight
         ref={sun}
         color={p.sun}

@@ -78,6 +78,11 @@ export interface Theme {
   stationBase?: 'hex' | 'square' | 'none';
   /** Light levels; omitted values keep the sunny outdoor defaults. */
   lighting?: { sun?: number; hemi?: number; ambient?: number; fogNear?: number; fogFar?: number };
+  /**
+   * Time of day. `night` fixes it (0 = noon, 1 = midnight, e.g. 1 for a party), `cycleSeconds` loops day → dusk → night → dawn.
+   * Windows, lamps and neon glow brighter as it gets dark.
+   */
+  time?: { night?: number; cycleSeconds?: number; nightSky?: string };
 }
 
 /** Resolves a model key ("nature/tree_oak") or absolute URL to a URL. */

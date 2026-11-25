@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import type { PropPlacement } from '@agent-viz/protocol';
 import { useEngine } from '../context';
 import { resolveModelUrl } from '../themes/theme';
+import { isShape, Shape } from './shapes';
 
 const offsets = new WeakMap<THREE.Object3D, THREE.Vector3>();
 const prepared = new WeakSet<THREE.Object3D>();
@@ -80,8 +81,15 @@ export function Model({ model, position = [0, 0, 0], rotation = 0, scale = 1, ca
   );
 }
 
-/** Places a world/station prop using the theme's prop scale. */
+/** Places a world/station prop using the theme's prop scale (built-in shapes are already in world units). */
 export function Prop({ prop, baseScale }: { prop: PropPlacement; baseScale: number }) {
+  if (isShape(prop.model)) {
+    return (
+      <group position={[prop.position[0], prop.y ?? 0, prop.position[1]]} rotation-y={prop.rotation ?? 0} scale={prop.scale ?? 1}>
+        <Shape model={prop.model} {...(prop.color ? { color: prop.color } : {})} {...(prop.variant !== undefined ? { variant: prop.variant } : {})} />
+      </group>
+    );
+  }
   return (
     <Model
       model={prop.model}

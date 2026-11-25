@@ -17,6 +17,10 @@ export interface PropPlacement {
   rotation?: number;
   scale?: number;
   castShadow?: boolean;
+  /** Tint for built-in shapes ("shape/…" models). */
+  color?: string;
+  /** Picks a variation of a built-in shape (e.g. building height or stall goods). */
+  variant?: number;
 }
 
 export interface StationSlot {
@@ -74,6 +78,8 @@ export interface IslandDef {
   seed: number;
   /** Decoration density multiplier (0 disables decor). */
   decorDensity?: number;
+  /** Keep scattered decoration this far in from the edge (e.g. inside a ring road). */
+  decorInset?: number;
 }
 
 /** Shape of the ground agents walk on. */

@@ -142,11 +142,15 @@ function Overview({ store }: { store: AgentWorldStore }) {
   const tasks = useStore(store, (s) => s.tasks);
   const load = useStore(store, useShallow((s) => selectStationLoad(s).map((l) => `${l.station.id}|${l.station.name}|${l.station.color}|${l.occupied}|${l.capacity}|${l.waiting}`)));
   const [selected, setSelected] = useState<string | null>(null);
+  const [sound, setSound] = useState(false);
 
   return (
     <div className="overview">
       <section className="world-frame card">
-        <AgentWorld store={store} selectedAgentId={selected} onSelectAgent={setSelected} />
+        <AgentWorld store={store} selectedAgentId={selected} onSelectAgent={setSelected} sound={sound} />
+        <button className="btn sm sound-toggle" onClick={() => setSound((v) => !v)} aria-pressed={sound} title="Ambient sound">
+          {sound ? '🔊 Sound on' : '🔈 Sound off'}
+        </button>
         {m.agents === 0 && (
           <div className="world-empty">
             No agents yet. Send events from your app, or try the <b>Send test events</b> tab.

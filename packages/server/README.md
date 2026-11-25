@@ -12,7 +12,7 @@ npm run server:auth                  # API keys required; prints an admin token 
 npm run aw -- --auth --host 0.0.0.0  # serve on your network (auth is required for non-localhost hosts)
 ```
 
-Flags: `--port`, `--host`, `--data <dir>`, `--memory`, `--auth`, `--insecure`, `--mock [project]`.
+Flags: `--port`, `--host`, `--data <dir>`, `--memory`, `--auth`, `--insecure`, `--mock [project]`, `--world <id>` (world for new projects).
 
 ## Projects and keys
 
@@ -29,7 +29,9 @@ Keys are stored as SHA-256 hashes, and each full key is shown exactly once, when
 ### From the CLI (works while the server runs)
 
 ```bash
-npm run aw -- projects create my-app --name "My App"
+npm run aw -- projects create my-app --name "My App" --world city
+npm run aw -- projects set-world my-app party        # a running server picks this up on restart; switch live from the console or PATCH
+npm run aw -- worlds                                 # meadow-island, office, city, market, party
 npm run aw -- keys create --project my-app --role write --name ci
 npm run aw -- keys create --project my-app --role read --name dashboard
 npm run aw -- keys list --project my-app
@@ -42,8 +44,10 @@ npm run aw -- admin-token reset
 | Method | Path | Who |
 |---|---|---|
 | GET | `/health` | Anyone |
-| GET, POST | `/v1/projects` | Admin |
+| GET | `/v1/worlds` | Anyone (the worlds projects can use) |
+| GET, POST | `/v1/projects` | Admin (POST takes `{ id, name?, worldId? }`) |
 | GET, DELETE | `/v1/projects/:id` | Read key / admin |
+| PATCH | `/v1/projects/:id` | Admin: `{ name?, worldId? }`; changing the world moves everyone watching to it, live |
 | POST | `/v1/projects/:id/events` | Write key |
 | GET | `/v1/projects/:id/snapshot` | Read key |
 | WS | `/v1/projects/:id/ws?token=…` | Read key (sending commands needs a write key) |

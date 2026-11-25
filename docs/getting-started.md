@@ -21,7 +21,8 @@ accepts connections from your own machine.
 
 ## 2. Make a project
 
-On the **Projects** page, create a project, for example `my-app`. Each project is its own island.
+On the **Projects** page, create a project, for example `my-app`, and pick its world: **Meadow Island**, **Office**, **City**,
+**Market** or **Party**. You can change it later with **Change world** on the project page.
 
 ## 3. Send your first events
 

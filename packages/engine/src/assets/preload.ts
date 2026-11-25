@@ -9,7 +9,8 @@ export function collectModelUrls(world: WorldConfig, theme: Theme): string[] {
   for (const p of world.props ?? []) keys.add(p.model);
   const d = theme.decor;
   for (const [k] of [...d.trees, ...d.rocks, ...d.plants, ...d.shoreline]) keys.add(k);
-  return [...keys].map((k) => resolveModelUrl(theme, k));
+  // built-in shapes ("shape/…") are drawn in code, nothing to download
+  return [...keys].filter((k) => !k.startsWith('shape/')).map((k) => resolveModelUrl(theme, k));
 }
 
 const done = new Set<string>();
