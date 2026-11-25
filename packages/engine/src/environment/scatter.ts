@@ -15,7 +15,7 @@ export interface DecorItem {
  * Deterministic decoration placement: rejection-samples points on the island
  * that stay clear of paths, stations and hand-placed props.
  */
-export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: number): DecorItem[] {
+export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: number, counts: Partial<Record<'trees' | 'rocks' | 'plants' | 'shoreline', number>> = {}): DecorItem[] {
   const density = world.island.decorDensity ?? 1;
   if (density <= 0) return [];
   const rnd = mulberry32(world.island.seed);
@@ -38,7 +38,9 @@ export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: num
     return true;
   };
 
+  const square = world.ground?.shape === 'square';
   const inside = (p: Vec2, margin: number) => {
+    if (square) return Math.abs(p[0]) < R - margin && Math.abs(p[1]) < R - margin;
     const a = Math.atan2(p[1], p[0]);
     return Math.hypot(p[0], p[1]) < R * shoreNoise(a, world.island.seed) - margin;
   };
@@ -53,6 +55,7 @@ export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: num
     sample: () => Vec2,
     margin: number,
   ) => {
+    if (!pool.length) return;
     let made = 0;
     for (let tries = 0; tries < count * 30 && made < count; tries++) {
       const p = sample();
@@ -70,19 +73,26 @@ export function scatterDecor(world: WorldConfig, decor: DecorDef, propScale: num
   };
 
   const disk = (): Vec2 => {
+    if (square) return [(rnd() * 2 - 1) * R, (rnd() * 2 - 1) * R];
     const r = R * Math.sqrt(rnd());
     const a = rnd() * Math.PI * 2;
     return [Math.cos(a) * r, Math.sin(a) * r];
   };
   const rim = (): Vec2 => {
+    if (square) {
+      // along the edges of the block
+      const t = (rnd() * 2 - 1) * R * 0.92;
+      const e = R * (0.8 + rnd() * 0.1) * (rnd() < 0.5 ? -1 : 1);
+      return rnd() < 0.5 ? [t, e] : [e, t];
+    }
     const a = rnd() * Math.PI * 2;
     const r = R * shoreNoise(a, world.island.seed) * (0.84 + rnd() * 0.1);
     return [Math.cos(a) * r, Math.sin(a) * r];
   };
 
-  place('shore', decor.shoreline, Math.round(9 * density), 0.9, 0.9, [0.85, 1.15], rim, 0.4);
-  place('tree', decor.trees, Math.round(22 * density), 0.85, 1.0, [0.7, 1.05], disk, 0.8);
-  place('rock', decor.rocks, Math.round(12 * density), 0.45, 0.7, [0.7, 1.2], disk, 0.6);
-  place('plant', decor.plants, Math.round(80 * density), 0.25, 0.65, [0.8, 1.3], disk, 0.5);
+  place('shore', decor.shoreline, Math.round((counts.shoreline ?? 9) * density), 0.9, 0.9, [0.85, 1.15], rim, 0.4);
+  place('tree', decor.trees, Math.round((counts.trees ?? 22) * density), 0.85, 1.0, [0.7, 1.05], disk, 0.8);
+  place('rock', decor.rocks, Math.round((counts.rocks ?? 12) * density), 0.45, 0.7, [0.7, 1.2], disk, 0.6);
+  place('plant', decor.plants, Math.round((counts.plants ?? 80) * density), 0.25, 0.65, [0.8, 1.3], disk, 0.5);
   return out;
 }

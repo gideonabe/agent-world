@@ -155,10 +155,15 @@ export class WebSocketEventSource implements BidirectionalEventSource {
     if (!msg || !this.emit) return;
     switch (msg.kind) {
       case 'hello':
+        this.clockOffset = msg.serverTime - Date.now();
+        if (msg.worldId) this.controls?.world?.(msg.worldId);
+        break;
       case 'pong':
         this.clockOffset = msg.serverTime - Date.now();
         break;
       case 'snapshot':
+        // switch layout first, so the authoritative occupancy lands on the right stations
+        if (msg.worldId) this.controls?.world?.(msg.worldId);
         this.controls?.hydrate(msg.state);
         break;
       case 'events':

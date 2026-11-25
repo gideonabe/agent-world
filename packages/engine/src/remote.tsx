@@ -2,7 +2,7 @@ import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-viz/core';
 import type { WorldConfig } from '@agent-viz/protocol';
 import { AgentWorld, type AgentWorldProps } from './AgentWorld';
-import { meadowIsland } from './presets/meadowIsland';
+import { getWorld, meadowIsland } from './presets';
 
 export interface RemoteWorldOptions {
   /** Server base URL, e.g. http://127.0.0.1:8787 */
@@ -11,8 +11,13 @@ export interface RemoteWorldOptions {
   project?: string;
   /** Read (or write) key, when the server runs with --auth. */
   token?: string;
-  /** World layout; must match the project's world (default: Meadow Island). */
+  /**
+   * World to start with (default: Meadow Island). The view switches to the project's world as soon as the
+   * server says which one it uses; pass `resolveWorld` to support custom worlds.
+   */
   world?: WorldConfig;
+  /** Looks up custom worlds by id (built-in worlds are always known). */
+  resolveWorld?: (worldId: string) => WorldConfig | undefined;
 }
 
 /** http(s)://host → ws(s)://host/v1/projects/<project>/ws */
@@ -35,11 +40,11 @@ export interface RemoteWorld {
  * Connects a store to a server project. Use it when you want your own UI
  * around the world (lists, stats) on top of the same live state.
  */
-export function useRemoteWorld({ server, project = 'default', token, world = meadowIsland }: RemoteWorldOptions): RemoteWorld {
+export function useRemoteWorld({ server, project = 'default', token, world = meadowIsland, resolveWorld }: RemoteWorldOptions): RemoteWorld {
   const { store, socket } = useMemo(
     () => ({
       // the server runs settle/stall timers; viewers just mirror its state
-      store: createAgentWorldStore(world, { lifecycle: false }),
+      store: createAgentWorldStore(world, { lifecycle: false, resolveWorld: (id) => resolveWorld?.(id) ?? getWorld(id) }),
       socket: new WebSocketEventSource({ url: remoteSocketUrl(server, project), ...(token ? { token } : {}) }),
     }),
     [server, project, token, world],
@@ -62,8 +67,14 @@ export interface AgentWorldViewProps extends RemoteWorldOptions, Omit<AgentWorld
  *
  *   <AgentWorldView server="http://127.0.0.1:8787" project="my-app" token={READ_KEY} />
  */
-export function AgentWorldView({ server, project, token, world, onStatusChange, ...rest }: AgentWorldViewProps) {
-  const remote = useRemoteWorld({ server, ...(project ? { project } : {}), ...(token ? { token } : {}), ...(world ? { world } : {}) });
+export function AgentWorldView({ server, project, token, world, resolveWorld, onStatusChange, ...rest }: AgentWorldViewProps) {
+  const remote = useRemoteWorld({
+    server,
+    ...(project ? { project } : {}),
+    ...(token ? { token } : {}),
+    ...(world ? { world } : {}),
+    ...(resolveWorld ? { resolveWorld } : {}),
+  });
   useEffect(() => onStatusChange?.(remote.status, remote.error), [remote.status, remote.error, onStatusChange]);
   return <AgentWorld store={remote.store} {...rest} />;
 }

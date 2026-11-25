@@ -4,6 +4,8 @@ import type { AgentWorldEvent, EventEnvelope, WorldSnapshot } from '@agent-viz/p
 export interface SourceControls {
   /** Replace the store's state with an authoritative snapshot (e.g. on (re)connect). */
   hydrate(snapshot: WorldSnapshot): void;
+  /** The server says which world (layout) the project uses; the store switches to it when it knows that world. */
+  world?(worldId: string): void;
 }
 
 /**

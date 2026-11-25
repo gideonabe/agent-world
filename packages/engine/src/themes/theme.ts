@@ -72,6 +72,12 @@ export interface Theme {
   propScale: number;
   /** Recolour asset materials by name (e.g. { leafsGreen: '#5cae4a' }). */
   materialColors?: Record<string, string>;
+  /** How many decor items of each kind are scattered (defaults: 22 trees, 12 rocks, 80 plants, 9 shoreline). */
+  decorCounts?: Partial<Record<'trees' | 'rocks' | 'plants' | 'shoreline', number>>;
+  /** Floor plate under each station: hexagon (default), square, or none. */
+  stationBase?: 'hex' | 'square' | 'none';
+  /** Light levels; omitted values keep the sunny outdoor defaults. */
+  lighting?: { sun?: number; hemi?: number; ambient?: number; fogNear?: number; fogFar?: number };
 }
 
 /** Resolves a model key ("nature/tree_oak") or absolute URL to a URL. */

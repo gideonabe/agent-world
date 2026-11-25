@@ -9,18 +9,19 @@ export function Lighting() {
   const { theme, world } = useEngine();
   const p = theme.palette;
   const R = world.island.radius;
+  const l = theme.lighting ?? {};
   const sun = useRef<THREE.DirectionalLight>(null);
   return (
     <>
       <color attach="background" args={[p.background]} />
-      <fog attach="fog" args={[p.fog, R * 3.2, R * 6.5]} />
-      <hemisphereLight args={[p.hemiSky, p.hemiGround, 1.25]} />
-      <ambientLight intensity={0.25} />
+      <fog attach="fog" args={[p.fog, R * (l.fogNear ?? 3.2), R * (l.fogFar ?? 6.5)]} />
+      <hemisphereLight args={[p.hemiSky, p.hemiGround, l.hemi ?? 1.25]} />
+      <ambientLight intensity={l.ambient ?? 0.25} />
       <directionalLight
         ref={sun}
         color={p.sun}
         position={[R * 1.5, R * 2.6, R * 1.0]}
-        intensity={2.4}
+        intensity={l.sun ?? 2.4}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-R * 1.3}

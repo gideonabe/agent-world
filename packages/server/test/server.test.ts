@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createAgentWorldStore, WebSocketEventSource, type AgentWorldStore, type ConnectionStatus } from '@agent-viz/core';
-import { meadowIsland } from '@agent-viz/engine/presets';
+import { allWorlds, getWorld, meadowIsland, office } from '@agent-viz/engine/presets';
 import { createAgentWorldServer, type AgentWorldServer, type AgentWorldServerOptions } from '../src';
 
 const until = async (cond: () => boolean, ms = 3000) => {
@@ -46,7 +46,7 @@ async function boot(o: Partial<AgentWorldServerOptions> = {}) {
 }
 
 function viewer(port: number, project: string, token?: string) {
-  const store: AgentWorldStore = createAgentWorldStore(meadowIsland, { lifecycle: false });
+  const store: AgentWorldStore = createAgentWorldStore(meadowIsland, { lifecycle: false, resolveWorld: getWorld });
   const src = new WebSocketEventSource({ url: `ws://127.0.0.1:${port}/v1/projects/${project}/ws`, pingMs: 0, minBackoffMs: 20, ...(token ? { token } : {}) });
   sockets.push(src);
   let status: ConnectionStatus = 'idle';
@@ -151,5 +151,47 @@ describe('simulator', () => {
     v.src.send([{ type: 'task.assigned', task: { id: 'ignored', agentId: id, kind: 'writing', title: 'Remote task' } }]);
     await until(() => v.store.getState().agents[id]?.status === 'working');
     expect(v.store.getState().agents[id]?.stationId).toBe('writers-nook');
+  });
+});
+
+describe('worlds', () => {
+  it('lists worlds and switches a project live; viewers follow and agents keep their tasks', async () => {
+    const { port, call } = await boot({ worlds: allWorlds });
+    const list = await call('GET', '/v1/worlds');
+    expect(list.body.worlds.map((w: { id: string }) => w.id)).toEqual(allWorlds.map((w) => w.id));
+    expect(list.body.default).toBe('meadow-island');
+
+    await call('POST', '/v1/projects/live/events', [
+      reg('r1'),
+      { type: 'task.assigned', task: { id: 't1', agentId: 'r1', kind: 'coding', title: 'Fix bug' } },
+    ]);
+    const v = viewer(port, 'live');
+    await until(() => v.store.getState().agents.r1?.stationId === 'code-forge');
+
+    const res = await call('PATCH', '/v1/projects/live', { worldId: 'office' });
+    expect(res.status).toBe(200);
+    expect(res.body.project.worldId).toBe('office');
+    await until(() => v.store.getState().world.id === 'office');
+    await until(() => v.store.getState().agents.r1?.stationId === 'dev-pods');
+    expect(v.store.getState().occupancy['dev-pods']).toEqual(['r1']);
+    expect((await call('GET', '/v1/projects/live/snapshot')).body.worldId).toBe('office');
+
+    // late joiners get the new world straight away
+    const late = viewer(port, 'live');
+    await until(() => late.store.getState().world.id === office.id && !!late.store.getState().agents.r1);
+
+    expect((await call('PATCH', '/v1/projects/live', { worldId: 'nope' })).status).toBe(400);
+  });
+
+  it('creates projects in a chosen world and keeps it across restarts', async () => {
+    const dataDir = tmp();
+    let { call } = await boot({ worlds: allWorlds, dataDir });
+    expect((await call('POST', '/v1/projects', { id: 'hq', worldId: 'office' })).status).toBe(201);
+    await call('POST', '/v1/projects/hq/events', [reg('a'), { type: 'task.assigned', task: { id: 't', agentId: 'a', kind: 'research', title: 'Read' } }]);
+    await server!.stop();
+    ({ call } = await boot({ worlds: allWorlds, dataDir }));
+    const snap = await call('GET', '/v1/projects/hq/snapshot');
+    expect(snap.body.worldId).toBe('office');
+    expect(snap.body.state.agents.a.stationId).toBe('library-corner');
   });
 });

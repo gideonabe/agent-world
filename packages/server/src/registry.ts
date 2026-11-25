@@ -137,6 +137,17 @@ export class Registry {
     return p;
   }
 
+  /** Updates a project's name and/or world. Returns the updated project, or undefined if it doesn't exist. */
+  updateProject(id: string, patch: { name?: string; worldId?: string }): Project | undefined {
+    this.refreshIfChanged();
+    const p = this.data.projects.find((pr) => pr.id === id);
+    if (!p) return undefined;
+    if (patch.name !== undefined) p.name = patch.name;
+    if (patch.worldId !== undefined) p.worldId = patch.worldId;
+    this.save();
+    return { ...p };
+  }
+
   deleteProject(id: string): boolean {
     const before = this.data.projects.length;
     this.data.projects = this.data.projects.filter((p) => p.id !== id);

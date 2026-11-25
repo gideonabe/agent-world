@@ -10,6 +10,7 @@ import {
 } from '@agent-viz/protocol';
 import {
   createAgentWorldStore,
+  rehomeWorld,
   MockEventSource,
   selectWorldMetrics,
   type AgentWorldStore,
@@ -52,7 +53,7 @@ export class ProjectHub {
   private flushTimer: ReturnType<typeof setTimeout> | undefined;
   private snapshots: SnapshotStore | undefined;
 
-  constructor(private readonly opts: HubOptions) {
+  constructor(private opts: HubOptions) {
     this.store = createAgentWorldStore(opts.world, {
       lifecycle: opts.lifecycle ?? {},
       onEvent: (env) => {
@@ -64,7 +65,12 @@ export class ProjectHub {
     if (opts.persistFile) {
       this.snapshots = new SnapshotStore(opts.persistFile, () => this.store.getState().snapshot());
       const saved = this.snapshots.load();
-      if (saved) this.store.getState().hydrate(saved);
+      if (saved) {
+        this.store.getState().hydrate(saved);
+        // saved under a different world (e.g. `projects set-world` while stopped): move agents to this world's stations
+        const known = new Set(opts.world.stations.map((st) => st.id));
+        if (Object.keys(saved.occupancy).some((id) => !known.has(id))) this.store.setState((st) => rehomeWorld(st, opts.world, Date.now()));
+      }
     }
     if (opts.mock) {
       this.mock = new MockEventSource({ ...opts.mock, projectId: opts.projectId });
@@ -78,6 +84,21 @@ export class ProjectHub {
 
   get worldId() {
     return this.opts.world.id;
+  }
+
+  /** Switches the project to another world. Agents keep their tasks; every viewer gets the new layout right away. */
+  setWorld(world: WorldConfig) {
+    if (world.id === this.opts.world.id) return;
+    this.opts.world = world;
+    this.store.getState().setWorld(world);
+    this.snapshots?.markDirty();
+    this.flush();
+    for (const v of this.viewers) this.greet(v.ws);
+  }
+
+  private greet(ws: WebSocket) {
+    this.send(ws, { kind: 'hello', version: 1, serverTime: Date.now(), projectId: this.projectId, worldId: this.worldId });
+    this.send(ws, { kind: 'snapshot', serverTime: Date.now(), worldId: this.worldId, state: this.store.getState().snapshot() });
   }
 
   viewerCount() {
@@ -115,8 +136,7 @@ export class ProjectHub {
   addViewer(ws: WebSocket, canWrite: boolean, onEvents: (v: { canWrite: boolean }, data: string) => void) {
     const v: Viewer = { ws, canWrite };
     this.viewers.add(v);
-    this.send(ws, { kind: 'hello', version: 1, serverTime: Date.now(), projectId: this.projectId, worldId: this.worldId });
-    this.send(ws, { kind: 'snapshot', serverTime: Date.now(), state: this.store.getState().snapshot() });
+    this.greet(ws);
     ws.on('message', (data) => onEvents(v, data.toString()));
     const drop = () => this.viewers.delete(v);
     ws.on('close', drop);

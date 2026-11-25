@@ -27,7 +27,7 @@ export type WorldSnapshot = z.infer<typeof WorldSnapshotSchema>;
 
 export const ServerMessageSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('hello'), version: z.number(), serverTime: z.number(), projectId: z.string().optional(), worldId: z.string().optional() }),
-  z.object({ kind: z.literal('snapshot'), serverTime: z.number(), state: WorldSnapshotSchema }),
+  z.object({ kind: z.literal('snapshot'), serverTime: z.number(), worldId: z.string().optional(), state: WorldSnapshotSchema }),
   z.object({ kind: z.literal('events'), envelopes: z.array(EventEnvelopeSchema) }),
   z.object({ kind: z.literal('error'), message: z.string(), code: z.string().optional() }),
   z.object({ kind: z.literal('pong'), serverTime: z.number() }),

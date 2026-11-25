@@ -8,7 +8,7 @@ import { scatterDecor, type DecorItem } from './scatter';
 /** Scattered trees/rocks/plants plus the world's hand-placed props. */
 export function Decor() {
   const { world, theme } = useEngine();
-  const items = useMemo(() => scatterDecor(world, theme.decor, theme.propScale), [world, theme]);
+  const items = useMemo(() => scatterDecor(world, theme.decor, theme.propScale, theme.decorCounts), [world, theme]);
   return (
     <group>
       {items.map((it, i) =>

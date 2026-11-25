@@ -1,5 +1,8 @@
 export { AgentWorld, type AgentWorldProps } from './AgentWorld';
 export { meadowTheme } from './themes/meadow';
+export { officeTheme } from './themes/office';
+export { getWorldStyle, registerWorldStyle, type WorldStyle } from './worlds';
+export { allWorlds, getWorld, office } from './presets';
 export { resolveModelUrl, type Theme, type ThemePalette, type RobotModelDef, type RobotClipMap, type DecorDef } from './themes/theme';
 export { meadowIsland } from './presets/meadowIsland';
 export { NavGraph } from './navigation/navGraph';

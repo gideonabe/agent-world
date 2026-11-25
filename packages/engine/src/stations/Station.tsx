@@ -26,19 +26,26 @@ export function Station({ station }: { station: StationDef }) {
   const isHome = station.id === world.homeStationId;
   const color = station.color ?? '#ffffff';
   const radius = station.radius ?? 2.5;
+  const base = theme.stationBase ?? 'hex';
+  // a square plate is a 4-sided cylinder turned 45°; widen it so its sides sit where the hexagon's did
+  const sides = base === 'square' ? { n: 4, k: Math.SQRT2 * 0.92 } : { n: 6, k: 1 };
 
   return (
     <group position={[station.position[0], 0, station.position[1]]} rotation-y={station.rotation ?? 0}>
       {!isHome && (
         <>
-          <mesh position-y={0.012} receiveShadow>
-            <cylinderGeometry args={[radius, radius, 0.06, 6]} />
-            <meshStandardMaterial color={theme.palette.deck} flatShading roughness={0.9} />
-          </mesh>
-          <mesh position-y={-0.005}>
-            <cylinderGeometry args={[radius + 0.14, radius + 0.14, 0.05, 6]} />
-            <meshStandardMaterial color={color} flatShading roughness={0.7} />
-          </mesh>
+          {base !== 'none' && (
+            <group rotation-y={base === 'square' ? Math.PI / 4 : 0}>
+              <mesh position-y={0.012} receiveShadow>
+                <cylinderGeometry args={[radius * sides.k, radius * sides.k, 0.06, sides.n]} />
+                <meshStandardMaterial color={theme.palette.deck} flatShading roughness={0.9} />
+              </mesh>
+              <mesh position-y={-0.005}>
+                <cylinderGeometry args={[radius * sides.k + 0.14, radius * sides.k + 0.14, 0.05, sides.n]} />
+                <meshStandardMaterial color={color} flatShading roughness={0.7} />
+              </mesh>
+            </group>
+          )}
           <Beacon color={color} busy={busy} capacity={station.slots.length} position={[0, 0, -radius + 0.35]} />
         </>
       )}

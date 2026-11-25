@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useStore } from 'zustand';
 import { createAgentWorldStore, MockEventSource, WebSocketEventSource, type ConnectionStatus } from '@agent-viz/core';
-import { AgentWorld, meadowIsland, meadowTheme, remoteSocketUrl } from '@agent-viz/engine';
+import { AgentWorld, getWorld, meadowIsland, remoteSocketUrl } from '@agent-viz/engine';
 import { TopBar } from './ui/TopBar';
 import { Roster } from './ui/Roster';
 import { Inspector } from './ui/Inspector';
@@ -11,6 +12,7 @@ import { createOrchestrator, createRemoteOrchestrator } from './orchestrator';
 //   default                               local simulator (MockEventSource)
 //   ?server=http://…:8787&project=x       live project on an Agent World server (&token=… with --auth)
 //   ?ws=ws://…/ws                         raw socket URL (legacy)
+//   ?world=office                         start in another built-in world (a live server picks the project's world)
 const params = new URLSearchParams(location.search);
 const serverUrl = params.get('server');
 const projectId = params.get('project') ?? 'default';
@@ -18,7 +20,8 @@ const wsUrl = serverUrl ? remoteSocketUrl(serverUrl, projectId) : params.get('ws
 const showStats = params.has('stats');
 
 // In live mode the server owns lifecycle timers (settle/stall), so the client doesn't run them.
-const store = createAgentWorldStore(meadowIsland, { lifecycle: wsUrl ? false : {} });
+const startWorld = getWorld(params.get('world') ?? '') ?? meadowIsland;
+const store = createAgentWorldStore(startWorld, { lifecycle: wsUrl ? false : {}, resolveWorld: getWorld });
 const socket = wsUrl ? new WebSocketEventSource({ url: wsUrl, ...(params.get('token') ? { token: params.get('token')! } : {}) }) : undefined;
 const mock = socket ? undefined : new MockEventSource({ agentCount: 9, seed: 7 });
 const source = socket ?? mock!;
@@ -32,6 +35,7 @@ export function App() {
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
   const connection = useSyncExternalStore(subscribeStatus, getStatus);
+  const worldName = useStore(store, (s) => s.world.name);
 
   useEffect(() => store.getState().connect(source), []);
   useEffect(() => void (mock && (mock.paused = paused)), [paused]);
@@ -44,10 +48,10 @@ export function App() {
 
   return (
     <div className="app">
-      <AgentWorld store={store} theme={meadowTheme} selectedAgentId={selected} onSelectAgent={setSelected} stats={showStats} />
+      <AgentWorld store={store} selectedAgentId={selected} onSelectAgent={setSelected} stats={showStats} />
       <TopBar
         store={store}
-        worldName={serverUrl ? `${meadowIsland.name} · ${projectId}` : meadowIsland.name}
+        worldName={serverUrl ? `${worldName} · ${projectId}` : worldName}
         source={socket ? { kind: 'live', url: wsUrl!, status: connection ?? 'idle' } : { kind: 'mock' }}
         paused={paused}
         onTogglePause={() => setPaused((p) => !p)}

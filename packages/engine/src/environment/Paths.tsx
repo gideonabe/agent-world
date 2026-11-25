@@ -4,13 +4,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { useEngine } from '../context';
 import { mulberry32 } from '../math';
 
-const WIDTH = 1.05;
+const DEFAULT_WIDTH = 1.05;
 
 /**
  * Dirt paths generated from the navigation graph, so what agents walk on is
  * always what you see. Merged into a single draw call, plus instanced pebbles.
  */
-export function Paths() {
+export function Paths({ width: WIDTH = DEFAULT_WIDTH, pebbles: withPebbles = true, plaza = 2.5 }: { width?: number; pebbles?: boolean; plaza?: number } = {}) {
   const { nav, theme, world } = useEngine();
   const p = theme.palette;
 
@@ -34,8 +34,8 @@ export function Paths() {
     }
     // plaza clearing
     const home = world.stations.find((s) => s.id === world.homeStationId);
-    if (home) {
-      const g = new THREE.CircleGeometry(2.5, 14);
+    if (home && plaza > 0) {
+      const g = new THREE.CircleGeometry(plaza, 14);
       g.rotateX(-Math.PI / 2);
       g.translate(home.position[0], 0, home.position[1]);
       parts.push(g);
@@ -43,9 +43,10 @@ export function Paths() {
     const merged = mergeGeometries(parts.map((g) => g.toNonIndexed()));
     parts.forEach((g) => g.dispose());
     return merged;
-  }, [nav, world]);
+  }, [nav, world, WIDTH, plaza]);
 
   const pebbles = useMemo(() => {
+    if (!withPebbles) return [];
     const rnd = mulberry32(world.island.seed + 9);
     const list: { x: number; z: number; s: number; r: number }[] = [];
     for (const [a, b] of nav.edges) {
@@ -66,7 +67,7 @@ export function Paths() {
       }
     }
     return list;
-  }, [nav, world.island.seed]);
+  }, [nav, world.island.seed, withPebbles, WIDTH]);
 
   const inst = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
@@ -88,10 +89,10 @@ export function Paths() {
       <mesh geometry={geometry} position-y={0.015} receiveShadow>
         <meshStandardMaterial color={p.path} roughness={1} polygonOffset polygonOffsetFactor={-2} />
       </mesh>
-      <instancedMesh ref={inst} args={[undefined, undefined, pebbles.length]} receiveShadow>
+      {pebbles.length > 0 && <instancedMesh ref={inst} args={[undefined, undefined, pebbles.length]} receiveShadow>
         <dodecahedronGeometry args={[1, 0]} />
         <meshStandardMaterial color={p.pathEdge} flatShading roughness={1} />
-      </instancedMesh>
+      </instancedMesh>}
     </group>
   );
 }

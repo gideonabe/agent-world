@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { meadowIsland } from '@agent-viz/engine/presets';
+import { allWorlds } from '@agent-viz/engine/presets';
 import { createAgentWorldServer, DEFAULT_PROJECT } from './server';
 import { Registry, registryPath, type KeyRole } from './registry';
 
@@ -17,10 +17,13 @@ const HELP = `Agent World server
     --auth                 require API keys (needed for non-localhost hosts)
     --insecure             allow --host 0.0.0.0 without --auth (not recommended)
     --mock [project]       run the simulator in a project (default: "default")
+    --world <id>           world for new projects (default: meadow-island; see "worlds")
     --dashboard <dir>      serve a built console from <dir> (auto-detected; --no-dashboard to disable)
 
   projects list
-  projects create <id> [--name <name>]
+  worlds                   list the worlds projects can use
+  projects create <id> [--name <name>] [--world <id>]
+  projects set-world <id> <worldId>   switch a project's world (live viewers follow)
   projects delete <id>
   keys list [--project <id>]
   keys create --project <id> [--role write|read] [--name <label>]
@@ -67,7 +70,7 @@ async function serve() {
 
   const server = createAgentWorldServer({
     ...(staticDir ? { staticDir } : {}),
-    worlds: [meadowIsland],
+    worlds: orderedWorlds(),
     port,
     host,
     auth,
@@ -105,13 +108,23 @@ function manage(cmd: string, sub: string | undefined) {
       for (const p of reg.listProjects()) console.log(`${p.id.padEnd(24)} ${p.name}  (world: ${p.worldId})`);
       return;
     case 'projects create': {
-      if (!id) fail('usage: projects create <id> [--name <name>]');
+      if (!id) fail('usage: projects create <id> [--name <name>] [--world <id>]');
+      const worldId = opt('world');
+      if (worldId && !allWorlds.some((w) => w.id === worldId)) fail(`unknown world "${worldId}". Run "worlds" to list them.`);
       try {
-        const p = reg.createProject({ id, ...(opt('name') ? { name: opt('name')! } : {}) });
+        const p = reg.createProject({ id, ...(opt('name') ? { name: opt('name')! } : {}), ...(worldId ? { worldId } : {}) });
         console.log(`created project ${p.id}`);
       } catch (e) {
         fail((e as Error).message);
       }
+      return;
+    }
+    case 'projects set-world': {
+      const worldId = positional[3];
+      if (!id || !worldId) fail('usage: projects set-world <id> <worldId>');
+      if (!allWorlds.some((w) => w.id === worldId)) fail(`unknown world "${worldId}". Run "worlds" to list them.`);
+      if (!reg.updateProject(id, { worldId })) fail(`no project ${id}`);
+      console.log(`project ${id} now uses ${worldId}. A running server picks this up on restart; use the console to switch live.`);
       return;
     }
     case 'projects delete':
@@ -162,8 +175,17 @@ function claudeInstall(uninstall: boolean): never {
   process.exit(r.status ?? 1);
 }
 
+/** All built-in worlds, with the one picked by --world first (the first world is the default for new projects). */
+function orderedWorlds() {
+  const id = opt('world');
+  if (!id) return allWorlds;
+  const first = allWorlds.find((w) => w.id === id) ?? fail(`unknown world "${id}". Run "worlds" to list them.`);
+  return [first, ...allWorlds.filter((w) => w !== first)];
+}
+
 const [cmd, sub] = positional;
 if (flag('help') || cmd === 'help') console.log(HELP);
+else if (cmd === 'worlds') for (const w of allWorlds) console.log(`${w.id.padEnd(16)} ${w.name}${w.description ? `  ${w.description}` : ''}`);
 else if (cmd === 'claude-install' || cmd === 'claude-uninstall') claudeInstall(cmd === 'claude-uninstall');
 else if (!cmd || cmd === 'serve') await serve();
 else manage(cmd, sub);

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import type { AdminApi, ProjectInfo } from '../api';
+import { useEffect, useState } from 'react';
+import type { AdminApi, ProjectInfo, WorldInfo } from '../api';
+import { WorldSwatch } from '../components/WorldPicker';
 import { href, navigate } from '../router';
 import { ErrorNote, Empty, pct } from '../components/ui';
 
@@ -7,13 +8,22 @@ export function ProjectsPage({ api, projects, onChanged, authMode }: { api: Admi
   const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState<unknown>();
+  const [worlds, setWorlds] = useState<WorldInfo[]>([]);
+  const [worldId, setWorldId] = useState('');
+  useEffect(() => {
+    api.worlds().then((r) => {
+      setWorlds(r.worlds);
+      setWorldId((w) => w || r.default);
+    });
+  }, [api]);
+  const worldName = (id: string) => worlds.find((w) => w.id === id)?.name ?? id;
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(undefined);
     try {
       const slug = id.trim().toLowerCase();
-      await api.createProject(slug, name.trim() || undefined);
+      await api.createProject(slug, name.trim() || undefined, worldId || undefined);
       onChanged();
       navigate('p', slug, 'integrate');
     } catch (err) {
@@ -26,7 +36,7 @@ export function ProjectsPage({ api, projects, onChanged, authMode }: { api: Admi
       <header className="page-head">
         <div>
           <h1>Projects</h1>
-          <p className="muted">Each project is its own island, with its own agents, API keys and viewers.</p>
+          <p className="muted">Each project is its own world, with its own agents, API keys and viewers.</p>
         </div>
       </header>
 
@@ -47,6 +57,12 @@ export function ProjectsPage({ api, projects, onChanged, authMode }: { api: Admi
                 <div>
                   <h3>{p.name}</h3>
                   <code className="muted">{p.id}</code>
+                  <div className="muted small" style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                    <span style={{ width: 56 }}>
+                      <WorldSwatch worldId={p.worldId} />
+                    </span>
+                    {worldName(p.worldId)}
+                  </div>
                 </div>
                 <span className={`pill ${working ? 'live' : ''}`}>{working ? `${working} working` : p.live ? 'idle' : 'asleep'}</span>
               </div>
@@ -72,6 +88,15 @@ export function ProjectsPage({ api, projects, onChanged, authMode }: { api: Admi
           <h3>New project</h3>
           <input className="input" placeholder="id (e.g. my-app)" value={id} onChange={(e) => setId(e.target.value)} pattern="[a-z0-9][a-z0-9-]{0,47}" required />
           <input className="input" placeholder="Display name (optional)" value={name} onChange={(e) => setName(e.target.value)} />
+          {worlds.length > 1 && (
+            <select className="input" value={worldId} onChange={(e) => setWorldId(e.target.value)} aria-label="World">
+              {worlds.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          )}
           <ErrorNote error={error} />
           <button className="btn primary">Create project</button>
         </form>

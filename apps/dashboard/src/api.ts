@@ -17,6 +17,12 @@ export interface ProjectInfo {
   metrics?: WorldMetrics;
 }
 
+export interface WorldInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface KeyInfo {
   id: string;
   projectId: string;
@@ -74,7 +80,16 @@ export class AdminApi {
   health = () => this.req<Health>('GET', '/health');
   projects = () => this.req<{ projects: ProjectInfo[] }>('GET', '/v1/projects').then((r) => r.projects);
   project = (id: string) => this.req<{ project: ProjectInfo }>('GET', `/v1/projects/${enc(id)}`).then((r) => r.project);
-  createProject = (id: string, name?: string) => this.req<{ project: ProjectInfo }>('POST', '/v1/projects', { id, ...(name ? { name } : {}) });
+  createProject = (id: string, name?: string, worldId?: string) =>
+    this.req<{ project: ProjectInfo }>('POST', '/v1/projects', { id, ...(name ? { name } : {}), ...(worldId ? { worldId } : {}) });
+  updateProject = (id: string, patch: { name?: string; worldId?: string }) =>
+    this.req<{ project: ProjectInfo }>('PATCH', `/v1/projects/${enc(id)}`, patch).then((r) => r.project);
+  /** Worlds this server offers. Older servers don't have the endpoint: they only run Meadow Island. */
+  worlds = () =>
+    this.req<{ worlds: WorldInfo[]; default: string }>('GET', '/v1/worlds').catch(() => ({
+      worlds: [{ id: 'meadow-island', name: 'Meadow Island' }],
+      default: 'meadow-island',
+    }));
   deleteProject = (id: string) => this.req('DELETE', `/v1/projects/${enc(id)}`);
   keys = (id: string) => this.req<{ keys: KeyInfo[] }>('GET', `/v1/projects/${enc(id)}/keys`).then((r) => r.keys);
   createKey = (id: string, role: 'write' | 'read', name: string) =>

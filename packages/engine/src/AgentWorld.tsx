@@ -1,16 +1,14 @@
 import { Suspense, useMemo, type CSSProperties } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { useStore } from 'zustand';
 import { AdaptiveDpr, Stats } from '@react-three/drei';
 import type { AgentWorldStore } from '@agent-viz/core';
 import { EngineProvider } from './context';
 import { SelectionContext } from './selection';
-import { meadowTheme } from './themes/meadow';
 import type { Theme } from './themes/theme';
-import { Island } from './environment/Island';
-import { Water } from './environment/Water';
-import { Paths } from './environment/Paths';
 import { Decor } from './environment/Decor';
-import { Clouds, Lighting } from './environment/Sky';
+import { Lighting } from './environment/Sky';
+import { getWorldStyle } from './worlds';
 import { Stations } from './stations/Station';
 import { Agents } from './characters/Agents';
 import { CameraRig } from './camera/CameraRig';
@@ -20,6 +18,7 @@ import { Effects } from './effects/Effects';
 export interface AgentWorldProps {
   /** Store created with `createAgentWorldStore(world)`. */
   store: AgentWorldStore;
+  /** Overrides the look. By default each built-in world uses its own theme (see `getWorldStyle`). */
   theme?: Theme;
   selectedAgentId?: string | null;
   onSelectAgent?: (id: string | null) => void;
@@ -35,8 +34,12 @@ export interface AgentWorldProps {
  * The embeddable 3D world. Everything it shows comes from the store
  * (agents/tasks) and the world config (layout) — nothing is hardcoded.
  */
-export function AgentWorld({ store, theme = meadowTheme, selectedAgentId = null, onSelectAgent, effects = true, stats, className, style }: AgentWorldProps) {
-  useMemo(() => preloadWorldAssets(store.getState().world, theme), [store, theme]);
+export function AgentWorld({ store, theme: themeProp, selectedAgentId = null, onSelectAgent, effects = true, stats, className, style }: AgentWorldProps) {
+  const world = useStore(store, (s) => s.world);
+  const worldStyle = getWorldStyle(world.id);
+  const theme = themeProp ?? worldStyle.theme;
+  const { Scene } = worldStyle;
+  useMemo(() => preloadWorldAssets(world, theme), [world, theme]);
   const selection = useMemo(
     () => ({ selectedId: selectedAgentId, select: (id: string | null) => onSelectAgent?.(id) }),
     [selectedAgentId, onSelectAgent],
@@ -52,11 +55,11 @@ export function AgentWorld({ store, theme = meadowTheme, selectedAgentId = null,
       >
         <EngineProvider store={store} theme={theme}>
           <SelectionContext.Provider value={selection}>
+            {/* background and fog attach to the scene, so lighting stays outside the keyed group */}
             <Lighting />
-            <Island />
-            <Water />
-            <Paths />
-            <Clouds />
+            {/* keyed by world: switching worlds rebuilds the scene and robots pop in at their new stations */}
+            <group key={world.id}>
+            <Scene />
             {/* separate boundaries: each part appears as soon as its models are ready */}
             <Suspense fallback={null}>
               <Decor />
@@ -68,6 +71,7 @@ export function AgentWorld({ store, theme = meadowTheme, selectedAgentId = null,
               <Agents />
             </Suspense>
             {effects && <Effects />}
+            </group>
             <CameraRig />
           </SelectionContext.Provider>
         </EngineProvider>

@@ -349,3 +349,34 @@ function stripUndefined<T extends object>(o: T): Partial<T> {
   for (const [k, v] of Object.entries(o)) if (v !== undefined) (out as Record<string, unknown>)[k] = v;
   return out;
 }
+
+/**
+ * Moves every agent into a different world layout (e.g. when a project switches from Meadow Island to the City).
+ * Stations are matched by task kind/phase, so active tasks land at the equivalent station in the new world.
+ * Agents without an active task are released (they roam or rest at their destination). Destinations and
+ * explicit station ids that don't exist in the new world are dropped.
+ */
+export function rehomeWorld(state: WorldState, world: WorldConfig, now: number): WorldState {
+  const stationIds = new Set(world.stations.map((s) => s.id));
+  const nodeIds = new Set(world.navigation.nodes.map((n) => n.id));
+  let next: WorldState = { ...state, occupancy: {} };
+
+  for (const task of Object.values(next.tasks)) {
+    if (task.stationId && !stationIds.has(task.stationId) && !isTerminalStatus(task.status)) next = patchTask(next, task.id, { stationId: undefined });
+  }
+  for (const agent of Object.values(state.agents)) {
+    const id = agent.descriptor.id;
+    const d = agent.destination;
+    const keepDest = d && ('stationId' in d ? stationIds.has(d.stationId) : nodeIds.has(d.nodeId));
+    next = patchAgent(next, id, { stationId: undefined, slotIndex: undefined, ...(keepDest ? {} : { destination: undefined }) });
+    const task = activeTask(next, next.agents[id]!);
+    if (!task) continue;
+    const station = pickStation(world, task.phase ?? task.kind, next.occupancy, task.stationId);
+    if (!station) continue;
+    const alloc = allocateSlot(next.occupancy[station.id] ?? [], id);
+    next = { ...next, occupancy: { ...next.occupancy, [station.id]: alloc.slots } };
+    next = patchTask(next, task.id, { stationId: station.id, lastUpdateAt: now });
+    next = patchAgent(next, id, { stationId: station.id, slotIndex: alloc.index, updatedAt: now });
+  }
+  return next;
+}

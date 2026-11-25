@@ -12,7 +12,7 @@ import {
   type WorldConfig,
   type WorldSnapshot,
 } from '@agent-viz/protocol';
-import { applyEvent } from './reducer';
+import { applyEvent, rehomeWorld } from './reducer';
 import { emptyState, type WorldState } from './types';
 import type { AgentEventSource } from './sources/types';
 import { DEFAULT_LIFECYCLE, dueLifecycleEvents, type LifecycleOptions } from './lifecycle';
@@ -24,6 +24,11 @@ export interface AgentWorldStoreOptions {
   now?: () => number;
   /** Called for every applied envelope (e.g. to forward to a server). */
   onEvent?: (env: EventEnvelope) => void;
+  /**
+   * Looks up a world by id when a connected server says the project uses a different one
+   * (e.g. pass the engine's `getWorld`). Without it, the store keeps the world it was created with.
+   */
+  resolveWorld?: (worldId: string) => WorldConfig | undefined;
 }
 
 /** Management commands. Each one only emits protocol events, so local
@@ -56,6 +61,11 @@ export interface AgentWorldStoreState extends WorldState, AgentCommands {
   /** Connects an event source; returns a disconnect function. */
   connect: (source: AgentEventSource) => () => void;
   reset: () => void;
+  /**
+   * Switches to another world layout. Agents keep their tasks and walk to the matching station in the new world.
+   * A no-op when the world id is unchanged.
+   */
+  setWorld: (world: WorldConfig) => void;
   /** Replace agents/tasks/occupancy with an authoritative snapshot (clears the log). */
   hydrate: (snapshot: WorldSnapshot) => void;
   /** Serializable copy of the current state, for sending to late joiners. */
@@ -96,10 +106,20 @@ export function createAgentWorldStore(world: WorldConfig, options: AgentWorldSto
         return true;
       },
       connect: (source) => {
-        source.start((env) => get().dispatch(env), { hydrate: (snap) => get().hydrate(snap) });
+        source.start((env) => get().dispatch(env), {
+          hydrate: (snap) => get().hydrate(snap),
+          world: (id) => {
+            const w = options.resolveWorld?.(id);
+            if (w) get().setWorld(w);
+          },
+        });
         return () => source.stop();
       },
       reset: () => set({ ...emptyState() }),
+      setWorld: (next) => {
+        if (next.id === get().world.id) return;
+        set((s) => ({ ...rehomeWorld(s, next, now()), world: next }));
+      },
       hydrate: (snap) =>
         set({
           agents: snap.agents as WorldState["agents"],

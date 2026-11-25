@@ -76,10 +76,21 @@ export interface IslandDef {
   decorDensity?: number;
 }
 
+/** Shape of the ground agents walk on. */
+export interface GroundDef {
+  /** "island": round, organic shoreline (default). "square": a square diorama block (rooms, city blocks, markets). */
+  shape: 'island' | 'square';
+}
+
 export interface WorldConfig {
   id: string;
   name: string;
+  /** One-line description shown in world pickers. */
+  description?: string;
+  /** Size and seed of the ground. For square ground, `radius` is half the side length. */
   island: IslandDef;
+  /** Defaults to an island. */
+  ground?: GroundDef;
   navigation: NavGraphDef;
   stations: StationDef[];
   /** Station used for idle/home behaviour. */

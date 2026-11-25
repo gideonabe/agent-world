@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { selectAgentList, selectStationLoad, selectWorldMetrics, type AgentWorldStore } from '@agent-viz/core';
-import { AgentWorld, meadowTheme, STATUS_COLORS, useRemoteWorld } from '@agent-viz/engine';
-import type { AdminApi, ProjectInfo } from '../api';
+import { AgentWorld, STATUS_COLORS, useRemoteWorld } from '@agent-viz/engine';
+import type { AdminApi, ProjectInfo, WorldInfo } from '../api';
+import { WorldPicker } from '../components/WorldPicker';
 import { href, navigate } from '../router';
 import { ErrorNote, pct, Stat } from '../components/ui';
 import { EventsTab } from './EventsTab';
@@ -29,6 +30,30 @@ export function ProjectPage({ api, projectId, tab, onChanged }: { api: AdminApi;
     api.project(projectId).then(setProject, setError);
   }, [api, projectId]);
 
+  const [worlds, setWorlds] = useState<WorldInfo[]>([]);
+  const [picking, setPicking] = useState(false);
+  const [switching, setSwitching] = useState(false);
+  useEffect(() => {
+    api.worlds().then((r) => setWorlds(r.worlds));
+  }, [api]);
+  const worldName = worlds.find((w) => w.id === project?.worldId)?.name ?? project?.worldId ?? '…';
+  const switchWorld = useCallback(
+    async (worldId: string) => {
+      if (worldId === project?.worldId) return setPicking(false);
+      setSwitching(true);
+      try {
+        setProject(await api.updateProject(projectId, { worldId }));
+        setPicking(false);
+        onChanged();
+      } catch (e) {
+        setError(e);
+      } finally {
+        setSwitching(false);
+      }
+    },
+    [api, projectId, project?.worldId, onChanged],
+  );
+
   const remove = useCallback(async () => {
     if (!confirm(`Delete project "${projectId}"? Its agents, history and API keys are removed permanently.`)) return;
     try {
@@ -46,7 +71,13 @@ export function ProjectPage({ api, projectId, tab, onChanged }: { api: AdminApi;
         <div>
           <h1>{project?.name ?? projectId}</h1>
           <p className="muted">
-            <code>{projectId}</code> · world <code>{project?.worldId ?? '…'}</code> ·{' '}
+            <code>{projectId}</code> · {worldName}
+            {worlds.length > 1 && (
+              <button className="btn ghost sm" style={{ marginLeft: 4 }} onClick={() => setPicking((v) => !v)}>
+                {picking ? 'Close' : 'Change world'}
+              </button>
+            )}{' '}
+            ·{' '}
             <span className={`conn-state ${remote.status}`}>{remote.status === 'open' ? 'live' : remote.status}</span>
             {remote.error && <span className="error-inline"> — {remote.error}</span>}
           </p>
@@ -63,6 +94,16 @@ export function ProjectPage({ api, projectId, tab, onChanged }: { api: AdminApi;
         </div>
       </header>
       <ErrorNote error={error} />
+
+      {picking && project && (
+        <section className="card world-panel">
+          <div className="world-panel-head">
+            <h4 style={{ margin: 0 }}>Choose a world</h4>
+            <span className="muted small">Everyone watching switches with you. Robots keep their tasks and walk to the matching spot.</span>
+          </div>
+          <WorldPicker worlds={worlds} value={project.worldId} onChange={switchWorld} disabled={switching} />
+        </section>
+      )}
 
       <nav className="tabs">
         {TABS.map(([id, label]) => (
@@ -105,7 +146,7 @@ function Overview({ store }: { store: AgentWorldStore }) {
   return (
     <div className="overview">
       <section className="world-frame card">
-        <AgentWorld store={store} theme={meadowTheme} selectedAgentId={selected} onSelectAgent={setSelected} />
+        <AgentWorld store={store} selectedAgentId={selected} onSelectAgent={setSelected} />
         {m.agents === 0 && (
           <div className="world-empty">
             No agents yet. Send events from your app, or try the <b>Send test events</b> tab.

@@ -124,6 +124,14 @@ export function createAgentWorldServer(opts: AgentWorldServerOptions): AgentWorl
       return sendJson(res, 200, { ok: true, version: WIRE_VERSION, auth, projects: registry.listProjects().length });
     }
 
+    // the list of worlds isn't secret: viewers and pickers need it before signing in
+    if (req.method === 'GET' && url.pathname === '/v1/worlds') {
+      return sendJson(res, 200, {
+        default: defaultWorld.id,
+        worlds: opts.worlds.map((w) => ({ id: w.id, name: w.name, ...(w.description ? { description: w.description } : {}) })),
+      });
+    }
+
     const route = parseRoute(url.pathname);
     if (!route) {
       if (serveStatic?.(req, res, url.pathname)) return;
@@ -158,6 +166,25 @@ export function createAgentWorldServer(opts: AgentWorldServerOptions): AgentWorl
       case 'GET ': {
         authorize(p, pid, 'read');
         if (!registry.getProject(pid) && !getHub(pid)) throw new HttpError(404, `Unknown project "${pid}"`, 'not_found');
+        return sendJson(res, 200, { project: describeProject(pid) });
+      }
+      case 'PATCH ': {
+        authorize(p, pid, 'admin');
+        if (!project) throw new HttpError(404, `Unknown project "${pid}"`, 'not_found');
+        const body = (await readJsonBody(req, maxPayload)) as { name?: unknown; worldId?: unknown } | undefined;
+        const patch: { name?: string; worldId?: string } = {};
+        if (body?.name !== undefined) {
+          if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 80) throw new HttpError(400, '"name" must be 1-80 characters', 'bad_request');
+          patch.name = body.name.trim();
+        }
+        if (body?.worldId !== undefined) {
+          const world = typeof body.worldId === 'string' ? worlds.get(body.worldId) : undefined;
+          if (!world) throw new HttpError(400, `Unknown world "${String(body.worldId)}"`, 'bad_request');
+          patch.worldId = world.id;
+          hubs.get(pid)?.setWorld(world);
+        }
+        registry.updateProject(pid, patch);
+        if (patch.worldId) log(`project ${pid}: world is now ${patch.worldId}`);
         return sendJson(res, 200, { project: describeProject(pid) });
       }
       case 'DELETE ': {

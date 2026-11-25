@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { useStore } from 'zustand';
 import type { AgentWorldStore } from '@agent-viz/core';
 import type { WorldConfig } from '@agent-viz/protocol';
 import { NavGraph } from './navigation/navGraph';
@@ -25,7 +26,8 @@ export function EngineProvider({
   theme: Theme;
   children: ReactNode;
 }) {
-  const world = store.getState().world;
+  // follow live world switches (e.g. a project moved from Meadow Island to the Office)
+  const world = useStore(store, (s) => s.world);
   const value = useMemo<EngineRuntime>(
     () => ({ store, world, theme, nav: new NavGraph(world.navigation), motions: new Map() }),
     [store, world, theme],
