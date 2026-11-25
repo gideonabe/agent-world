@@ -7,13 +7,14 @@ It takes about five minutes to get a robot on screen.
 
 ## 1. Install and start the server
 
+You need [Node.js](https://nodejs.org) 20 or newer.
+
 ```bash
-git clone <your copy of agent-world>   # or download it
-cd agent-world
-npm install
-npm run build:dashboard                # builds this console once
-npm run server:empty                   # http://127.0.0.1:8787
+npx @agent-viz/server        # http://127.0.0.1:8787
 ```
+
+Or with Docker: `docker run -p 8787:8787 -v agent-world-data:/data ghcr.io/gideonabe/agent-world` (API keys are always on
+there; the admin token is printed in `docker logs`).
 
 Open **http://127.0.0.1:8787**. The server hosts this console. Locally it runs in **dev mode**: no API keys are needed, and it only
 accepts connections from your own machine.
@@ -55,7 +56,7 @@ Pick whichever fits:
 To let other machines or people use your server, turn on keys:
 
 ```bash
-npm run server:auth        # prints an ADMIN TOKEN once; sign in to this console with it
+npx @agent-viz/server --auth   # prints an ADMIN TOKEN once; sign in to this console with it
 ```
 
 Then create a **write key** for each app that sends events, and a **read key** for each viewer, in the project's **API keys** tab.

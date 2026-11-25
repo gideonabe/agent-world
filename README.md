@@ -6,52 +6,88 @@ of it is driven by a standardized event stream that any backend can produce.
 
 ## Quick start
 
+You need [Node.js](https://nodejs.org) 20 or newer.
+
 ```bash
-npm install
-npm run build:dashboard   # build the developer console once
-npm run server:empty      # server + console at http://127.0.0.1:8787
+npx @agent-viz/server
 ```
 
-Open **http://127.0.0.1:8787** to reach the **console**. From there you can create projects, manage API keys, watch live islands,
-inspect events, send test events, copy integration snippets, and read the docs. The docs are also in `docs/`.
+Open **http://127.0.0.1:8787**. That's the **console**: create projects, manage API keys, watch live islands, inspect
+events, send test events, copy integration snippets, and read the docs. Click **Send test events → Full demo** to see a
+robot get to work.
+
+Want to see it busy first? `npx @agent-viz/server --mock --memory` fills the `default` project with simulated agents.
+
+### Watch your Claude Code sessions
+
+```bash
+npx @agent-viz/server                  # keep this running
+npx @agent-viz/server claude-install   # in the project you use Claude Code in (or --user for all of them)
+```
+
+Restart Claude Code and your session appears as a robot that walks between stations as Claude reads, edits, and runs
+commands. Remove it with `npx @agent-viz/server claude-uninstall`. Details: [integrations/claude-code](integrations/claude-code/README.md).
+
+### Send events from your own app
+
+```bash
+npm install @agent-viz/sdk
+```
+
+```ts
+import { AgentWorldClient } from '@agent-viz/sdk';
+
+const world = new AgentWorldClient({ url: 'http://127.0.0.1:8787', project: 'my-app' });
+await world.agent({ name: 'Scout', kind: 'research' }).run('Find competitors', async (task) => {
+  task.progress(0.5, 'Reading sites');
+});
+```
+
+From any other language, POST JSON events:
+
+```bash
+curl -X POST http://127.0.0.1:8787/v1/projects/my-app/events -H 'content-type: application/json' -d '[
+  {"type":"agent.registered","agent":{"id":"bot-1","name":"Webhook","kind":"automation"}},
+  {"type":"task.assigned","task":{"id":"t-1","agentId":"bot-1","kind":"automation","title":"Sync CRM"}}
+]'
+curl -X POST http://127.0.0.1:8787/v1/projects/my-app/events -H 'content-type: application/json'   -d '{"type":"task.completed","taskId":"t-1"}'
+```
+
+To show the island inside your own React app, use `<AgentWorldView>` from `@agent-viz/engine` (see [docs/embedding.md](docs/embedding.md)).
+
+### Run it on a server (Docker)
+
+```bash
+docker run -d --name agent-world -p 8787:8787 -v agent-world-data:/data ghcr.io/gideonabe/agent-world
+docker logs agent-world        # the admin token is printed once, on first start
+```
+
+The container always runs with API keys on (`--auth`) and keeps projects and keys in the `/data` volume. Sign in to the
+console with the admin token, then create a write key for each app and a read key for each viewer. Put it behind an
+HTTPS reverse proxy before exposing it to the internet. To build the image yourself: `docker build -t agent-world .`
+
+Without Docker, `npx @agent-viz/server --auth --host 0.0.0.0` does the same.
+
+## Developing Agent World
+
+```bash
+git clone https://github.com/gideonabe/agent-world.git
+cd agent-world
+npm install
+npm run build:dashboard   # build the console once
+npm run server:empty      # server + console at http://127.0.0.1:8787
+```
 
 | Command | What it does |
 |---|---|
 | `npm run dev` | Standalone playground with a built-in simulator (http://localhost:5173) |
 | `npm run dev:dashboard` | The console with hot reload (http://localhost:5180) |
-| `npm test` · `npm run typecheck` · `npm run build` | 65 tests, strict TypeScript, and app builds |
-| `npm run build:packages` · `npm run verify:packages` | Build publishable npm packages into `release/`, then install them into a fresh project and test them |
+| `npm run server` | Server with the built-in simulator, memory only |
+| `npm test` · `npm run typecheck` · `npm run build` | Tests, strict TypeScript, and app builds |
+| `npm run build:packages` · `npm run verify:packages` | Build the npm packages into `release/`, then install them into a fresh project and test them |
+| `npm run publish:packages` | Publish to npm (run in your own terminal; npm asks for 2FA) |
 
-Add `?stats` to the playground URL for an FPS meter.
-
-### Live mode (real event stream over WebSocket)
-
-```bash
-npm run server        # Agent World server on :8787 with the built-in simulator
-npm run server:empty  # same, no simulator; send your own events
-npm run dev           # then open http://localhost:5173/?ws=ws://127.0.0.1:8787/ws
-```
-
-To drive it from any backend, POST events to the server:
-
-```bash
-curl -X POST http://127.0.0.1:8787/events -H 'content-type: application/json' -d '[
-  {"type":"agent.registered","agent":{"id":"bot-1","name":"Webhook","kind":"automation"}},
-  {"type":"task.assigned","task":{"id":"t-1","agentId":"bot-1","kind":"automation","title":"Sync CRM"}}
-]'
-curl -X POST http://127.0.0.1:8787/events -d '{"type":"task.completed","taskId":"t-1"}' -H 'content-type: application/json'
-```
-
-### Docker
-
-```bash
-docker build -t agent-world .
-docker run -d --name agent-world -p 8787:8787 -v agent-world-data:/data agent-world
-docker logs agent-world        # the admin token is printed once, on first start
-```
-
-The container always runs with API keys on (`--auth`), stores projects and keys in the `/data` volume, and serves the
-console at http://localhost:8787. Put it behind an HTTPS reverse proxy before exposing it to the internet.
+Add `?stats` to the playground URL for an FPS meter, and `?server=http://127.0.0.1:8787&project=default` to watch a live server.
 
 ## Packages
 
@@ -77,7 +113,8 @@ tarball into `release/`. In the workspace, packages still import TypeScript sour
 - `npm run verify:packages` installs the tarballs into an empty project, starts the server from its bin, runs the SDK against it,
   and checks types, assets, and the console.
 
-To publish, run `npm run publish:packages` in a terminal (npm asks you to confirm with 2FA). It publishes in dependency order and skips versions that are already on npm.
+To release: bump the versions, `npm run build:packages && npm run verify:packages`, then `npm run publish:packages` in your own
+terminal (npm asks you to confirm with 2FA). It publishes in dependency order and skips versions already on npm.
 
 ## How it works
 
@@ -195,11 +232,6 @@ await world.agent({ name: 'Scout', kind: 'research' }).run('Find competitors', a
 ```
 
 Or open the playground at `http://localhost:5173/?server=http://127.0.0.1:8787&project=my-app&token=<read key>`.
-
-## Watch your Claude Code sessions
-
-`integrations/claude-code` turns Claude Code hooks into Agent World events. Each session becomes a robot that walks
-between stations as Claude reads, edits, and runs commands. See [integrations/claude-code/README.md](integrations/claude-code/README.md).
 
 ## Live streaming
 
