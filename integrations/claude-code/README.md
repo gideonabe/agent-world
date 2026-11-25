@@ -19,35 +19,46 @@ This bridge shows your Claude Code sessions as robots on the island, live.
 ## Setup
 
 ```bash
-# 1. in the agent-world folder: start a server without the simulator
-npm run server:empty   # the console is at http://127.0.0.1:8787
+# 1. start the server and keep it running (the console is at http://127.0.0.1:8787)
+npx @agent-viz/server
 
-# 2. install the hooks into the project you're working on (personal file, not committed)
-npm run aw -- claude-install --project "C:/path/to/your/project"
-#    or for every Claude Code session on this machine:
-npm run aw -- claude-install --user
+# 2. in the folder you use Claude Code in
+npx @agent-viz/server claude-install            # robots appear in the "default" project
+npx @agent-viz/server claude-install my-app     # or report into the "my-app" project
 ```
 
-Then restart that Claude Code session, or run `/hooks` in it to confirm the hooks are listed. Your session shows up in
-the console under the `default` project.
+Then restart Claude Code in that folder (or run `/hooks` to check the hooks are listed). Open the project in the console
+and your session walks around while Claude works. The robot leaves when the session ends.
 
-The same commands ship in the server package, so once it's installed from npm you don't need this repo:
-`npx @agent-viz/server claude-install` (defaults to the current folder). That copies the hook scripts to
-`~/.agent-world/claude-code` so they keep working after npx cleans up.
+| Option | Does |
+|---|---|
+| `[project]` | Agent World project to report into (default: `default`) |
+| `--user` | Every Claude Code session on this machine, instead of just this folder |
+| `--project <dir>` | A different folder than the current one |
+| `--url <base url>` | Server URL (default `http://127.0.0.1:8787`) |
+| `--key <write key>` | Needed when the server runs with `--auth` |
+| `--dry-run` | Print the settings without writing them |
+
+Hooks go into `.claude/settings.local.json` (personal, not committed), or `~/.claude/settings.json` with `--user`. The
+hook scripts are copied to `~/.agent-world/claude-code`, so they keep working after npx cleans up. The installer keeps
+your other settings and hooks, and writes a timestamped backup before it changes anything.
+
+To remove the hooks, run `npx @agent-viz/server claude-uninstall` in the same folder (add `--user` if you installed
+with it).
 
 ### Reporting into a project on a secured server
 
+Create a write key for the project in the console's **API keys** tab, then:
+
 ```bash
-npm run aw -- keys create --project my-app --role write --name claude-code
-npm run aw -- claude-install --project "C:/path/to/project" --world-project my-app --key aww_…
+npx @agent-viz/server claude-install my-app --url https://your-server --key aww_…
 ```
 
-The key is saved in that project's `.claude/settings.local.json`, so keep that file out of version control. Watch
-the session in the console under the `my-app` project.
+The key is saved in that folder's `.claude/settings.local.json`, so keep that file out of version control.
 
-To remove the hooks: `npm run aw -- claude-uninstall --project "<path>"`. Add `--dry-run` to print the result
-without writing. The installer keeps your other settings and hooks, and writes a timestamped
-backup before it changes anything.
+### From a clone of this repo
+
+`npm run aw -- claude-install …` takes the same options and runs the hook scripts straight from `integrations/claude-code`.
 
 ## Safety
 

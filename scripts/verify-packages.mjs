@@ -81,7 +81,7 @@ console.log(JSON.stringify({ status: snap.state.agents['pkg-bot']?.stats, task: 
   // Claude Code bridge from the installed package, with a throwaway home dir
   const home = path.join(dir, 'home');
   const settingsFile = path.join(dir, 'claude-settings.json');
-  const ci = spawnSync(process.execPath, [path.join(mod('server'), 'cli.js'), 'claude-install', '--file', settingsFile, '--world-project', 'consumer'], {
+  const ci = spawnSync(process.execPath, [path.join(mod('server'), 'cli.js'), 'claude-install', 'consumer', '--file', settingsFile], {
     cwd: dir,
     env: { ...process.env, HOME: home, USERPROFILE: home },
   });

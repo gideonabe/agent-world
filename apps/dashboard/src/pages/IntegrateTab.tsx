@@ -72,11 +72,14 @@ await world.close();`}
 
       <section className="card">
         <h3>4 · Watch Claude Code sessions</h3>
+        <p className="muted small">Run this in the folder you use Claude Code in, then restart Claude Code there.</p>
         <Code
           lang="bash"
-          code={`node integrations/claude-code/install.mjs --project "C:/path/to/your/project" \\
-  --world-project ${projectId} --url ${url}${auth ? ` --key ${W}` : ''}`}
+          code={`npx @agent-viz/server@latest claude-install ${projectId}${url.replace(/\/+$/, '') === 'http://127.0.0.1:8787' ? '' : ` --url ${url}`}${auth ? ` --key ${W}` : ''}`}
         />
+        <p className="muted small">
+          Add <code>--user</code> to watch every Claude Code session on this machine. Undo with <code>npx @agent-viz/server claude-uninstall</code>.
+        </p>
       </section>
 
       <section className="card">

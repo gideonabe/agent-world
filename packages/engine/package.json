@@ -1,6 +1,6 @@
 {
   "name": "@agent-viz/engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React Three Fiber visualization engine for Agent World.",
   "license": "MIT",
   "repository": {
@@ -16,8 +16,8 @@
     "./presets": "./src/presets/index.ts"
   },
   "dependencies": {
-    "@agent-viz/core": "0.1.1",
-    "@agent-viz/protocol": "0.1.1"
+    "@agent-viz/core": "0.1.2",
+    "@agent-viz/protocol": "0.1.2"
   },
   "peerDependencies": {
     "@react-three/drei": "^10.7.0",

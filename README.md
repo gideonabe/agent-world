@@ -22,10 +22,16 @@ Want to see it busy first? `npx @agent-viz/server --mock --memory` fills the `de
 
 ```bash
 npx @agent-viz/server                  # keep this running
-npx @agent-viz/server claude-install   # in the project you use Claude Code in (or --user for all of them)
 ```
 
-Restart Claude Code and your session appears as a robot that walks between stations as Claude reads, edits, and runs
+Then, in the folder you use Claude Code in:
+
+```bash
+npx @agent-viz/server claude-install            # robots show up in the "default" project
+npx @agent-viz/server claude-install my-app     # or in a project of your choice
+```
+
+Add `--user` to cover every Claude Code session on your machine. Restart Claude Code and your session appears as a robot that walks between stations as Claude reads, edits, and runs
 commands. Remove it with `npx @agent-viz/server claude-uninstall`. Details: [integrations/claude-code](integrations/claude-code/README.md).
 
 ### Send events from your own app

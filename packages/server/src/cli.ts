@@ -27,10 +27,10 @@ const HELP = `Agent World server
   keys revoke <keyId>
   admin-token reset        print a new admin token (invalidates the old one)
 
-  claude-install           show your Claude Code sessions as robots (adds hooks)
-    --project <dir>        that project only (default: the current folder)
-    --user                 every Claude Code session on this machine
-    --world-project <id>   Agent World project to report into
+  claude-install [project] show this folder's Claude Code sessions as robots (adds hooks)
+                           [project] is the Agent World project to report into (default: "default")
+    --user                 every Claude Code session on this machine instead of this folder
+    --project <dir>        a different folder than the current one
     --key <write key>      needed when the server runs with --auth
     --url <base url>       default http://127.0.0.1:8787
     --dry-run              print the settings without writing
@@ -154,6 +154,8 @@ function claudeInstall(uninstall: boolean): never {
   );
   if (!script) fail('the Claude Code bridge is not included in this build');
   const rest = argv.slice(argv.indexOf(positional[0]!) + 1);
+  // `claude-install my-app` is short for `claude-install --world-project my-app`
+  if (rest[0] && !rest[0].startsWith('--')) rest.splice(0, 1, '--world-project', rest[0]);
   if (!['--project', '--user', '--file'].some((f) => rest.includes(f))) rest.push('--project', process.cwd());
   if (uninstall) rest.push('--uninstall');
   const r = spawnSync(process.execPath, [script, ...rest], { stdio: 'inherit' });

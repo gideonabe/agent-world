@@ -1,6 +1,6 @@
 {
   "name": "@agent-viz/protocol",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Standardized agent/task/event types and schemas for Agent World.",
   "license": "MIT",
   "repository": {

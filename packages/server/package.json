@@ -1,6 +1,6 @@
 {
   "name": "@agent-viz/server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Agent World integration server: WebSocket fan-out + REST ingest.",
   "license": "MIT",
   "repository": {
@@ -21,9 +21,9 @@
     "start": "tsx src/cli.ts"
   },
   "dependencies": {
-    "@agent-viz/core": "0.1.1",
-    "@agent-viz/engine": "0.1.1",
-    "@agent-viz/protocol": "0.1.1",
+    "@agent-viz/core": "0.1.2",
+    "@agent-viz/engine": "0.1.2",
+    "@agent-viz/protocol": "0.1.2",
     "ws": "^8.23.0"
   },
   "devDependencies": {
