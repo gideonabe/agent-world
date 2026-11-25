@@ -2,10 +2,18 @@
   "name": "@agent-world/core",
   "version": "0.1.0",
   "description": "Framework-agnostic, event-driven agent & task state for Agent World.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gideonabe/agent-world.git",
+    "directory": "packages/core"
+  },
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "dependencies": {
     "@agent-world/protocol": "0.1.0",
     "zustand": "^5.1.0"

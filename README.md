@@ -42,6 +42,17 @@ curl -X POST http://127.0.0.1:8787/events -H 'content-type: application/json' -d
 curl -X POST http://127.0.0.1:8787/events -d '{"type":"task.completed","taskId":"t-1"}' -H 'content-type: application/json'
 ```
 
+### Docker
+
+```bash
+docker build -t agent-world .
+docker run -d --name agent-world -p 8787:8787 -v agent-world-data:/data agent-world
+docker logs agent-world        # the admin token is printed once, on first start
+```
+
+The container always runs with API keys on (`--auth`), stores projects and keys in the `/data` volume, and serves the
+console at http://localhost:8787. Put it behind an HTTPS reverse proxy before exposing it to the internet.
+
 ## Packages
 
 | Package | Purpose | Depends on |
@@ -66,7 +77,7 @@ tarball into `release/`. In the workspace, packages still import TypeScript sour
 - `npm run verify:packages` installs the tarballs into an empty project, starts the server from its bin, runs the SDK against it,
   and checks types, assets, and the console.
 
-To publish, pick a license (none is set yet), then run `npm publish --access public` in each `packages/*/dist`.
+To publish, run `npm publish --access public` in each `packages/*/dist`.
 
 ## How it works
 
@@ -252,6 +263,6 @@ pooled `InstancedMesh`. Turn them off with `<AgentWorld effects={false} />`.
 
 See `docs/ARCHITECTURE.md` for the full design.
 
-## Assets
+## License
 
-The 3D models are CC0 (public domain). See `packages/engine/assets/models/CREDITS.md`.
+MIT, see [LICENSE](LICENSE). The 3D models are CC0 (public domain); see `packages/engine/assets/models/CREDITS.md`.

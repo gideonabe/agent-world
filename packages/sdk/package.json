@@ -2,6 +2,12 @@
   "name": "@agent-world/sdk",
   "version": "0.1.0",
   "description": "Tiny client for sending agent activity to an Agent World server (Node 18+ and browsers).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gideonabe/agent-world.git",
+    "directory": "packages/sdk"
+  },
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

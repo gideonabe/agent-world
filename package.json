@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "description": "Standalone, reusable 3D visualization platform for AI agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gideonabe/agent-world.git"
+  },
   "type": "module",
   "workspaces": [
     "packages/*",

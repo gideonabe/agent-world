@@ -34,12 +34,12 @@ Then restart that Claude Code session, or run `/hooks` in it to confirm the hook
 ### Reporting into a project on a secured server
 
 ```bash
-npm run aw -- keys create --project vakori --role write --name claude-code
-node integrations/claude-code/install.mjs --project "C:/path/to/project" --world-project vakori --key aww_…
+npm run aw -- keys create --project my-app --role write --name claude-code
+node integrations/claude-code/install.mjs --project "C:/path/to/project" --world-project my-app --key aww_…
 ```
 
 The key is saved in that project's `.claude/settings.local.json`, so keep that file out of version control. Watch
-the session at `/?server=http://127.0.0.1:8787&project=vakori&token=<read key>`.
+the session at `/?server=http://127.0.0.1:8787&project=my-app&token=<read key>`.
 
 To remove the hooks: `node integrations/claude-code/install.mjs --project "<path>" --uninstall`. Add `--dry-run`
 to print the result without writing. The installer keeps your other settings and hooks, and writes a timestamped

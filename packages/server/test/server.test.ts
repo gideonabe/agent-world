@@ -84,17 +84,17 @@ describe('auth mode', () => {
     expect((await call('POST', '/v1/projects/default/events', reg('x'))).status).toBe(401);
     expect((await call('POST', '/v1/projects/default/events', reg('x'), 'awk_wrong')).status).toBe(401);
 
-    expect((await call('POST', '/v1/projects', { id: 'vakori', name: 'Vakori' }, admin)).status).toBe(201);
-    expect((await call('POST', '/v1/projects', { id: 'vakori' }, admin)).status).toBe(409);
-    const write = (await call('POST', '/v1/projects/vakori/keys', { role: 'write', name: 'ci' }, admin)).body.key as string;
-    const read = (await call('POST', '/v1/projects/vakori/keys', { role: 'read' }, admin)).body.key as string;
+    expect((await call('POST', '/v1/projects', { id: 'my-app', name: 'My App' }, admin)).status).toBe(201);
+    expect((await call('POST', '/v1/projects', { id: 'my-app' }, admin)).status).toBe(409);
+    const write = (await call('POST', '/v1/projects/my-app/keys', { role: 'write', name: 'ci' }, admin)).body.key as string;
+    const read = (await call('POST', '/v1/projects/my-app/keys', { role: 'read' }, admin)).body.key as string;
     expect(write).toMatch(/^aww_/);
 
-    expect((await call('POST', '/v1/projects/vakori/events', reg('bot'), write)).status).toBe(202);
-    expect((await call('POST', '/v1/projects/vakori/events', reg('bot'), read)).status).toBe(403); // read-only
+    expect((await call('POST', '/v1/projects/my-app/events', reg('bot'), write)).status).toBe(202);
+    expect((await call('POST', '/v1/projects/my-app/events', reg('bot'), read)).status).toBe(403); // read-only
     expect((await call('POST', '/v1/projects/default/events', reg('bot'), write)).status).toBe(403); // other project
     expect((await call('GET', '/v1/projects', undefined, write)).status).toBe(403); // admin only
-    expect((await call('GET', '/v1/projects/vakori/snapshot', undefined, read)).status).toBe(200);
+    expect((await call('GET', '/v1/projects/my-app/snapshot', undefined, read)).status).toBe(200);
     expect((await call('POST', '/v1/projects/nope/events', reg('z'), admin)).status).toBe(404);
 
     // keys are hashed at rest
@@ -102,16 +102,16 @@ describe('auth mode', () => {
     expect(raw).not.toContain(write);
 
     // viewers: read key may watch but not command; bad key is rejected without retry loops
-    const ok = viewer(port, 'vakori', read);
+    const ok = viewer(port, 'my-app', read);
     await until(() => !!ok.store.getState().agents.bot);
-    const bad = viewer(port, 'vakori', 'awr_nope');
+    const bad = viewer(port, 'my-app', 'awr_nope');
     await until(() => bad.status() === 'closed');
     expect(bad.src.lastError).toMatch(/Invalid/);
 
     // revocation applies immediately
-    const keyId = (await call('GET', '/v1/projects/vakori/keys', undefined, admin)).body.keys.find((k: any) => k.role === 'write').id;
-    expect((await call('DELETE', `/v1/projects/vakori/keys/${keyId}`, undefined, admin)).status).toBe(200);
-    expect((await call('POST', '/v1/projects/vakori/events', reg('bot2'), write)).status).toBe(401);
+    const keyId = (await call('GET', '/v1/projects/my-app/keys', undefined, admin)).body.keys.find((k: any) => k.role === 'write').id;
+    expect((await call('DELETE', `/v1/projects/my-app/keys/${keyId}`, undefined, admin)).status).toBe(200);
+    expect((await call('POST', '/v1/projects/my-app/events', reg('bot2'), write)).status).toBe(401);
   });
 
   it('rate limits per key', async () => {

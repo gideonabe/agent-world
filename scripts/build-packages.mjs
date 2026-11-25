@@ -107,6 +107,7 @@ for (const p of PACKAGES) {
   if (p.assets) fs.cpSync(path.join(pkgDir, 'assets'), path.join(dist, 'assets'), { recursive: true });
   if (p.dashboard) fs.cpSync(path.join(root, 'apps', 'dashboard', 'dist'), path.join(dist, 'dashboard'), { recursive: true });
   for (const f of ['README.md']) if (fs.existsSync(path.join(pkgDir, f))) fs.copyFileSync(path.join(pkgDir, f), path.join(dist, f));
+  fs.copyFileSync(path.join(root, "LICENSE"), path.join(dist, "LICENSE"));
   if (p.bin) {
     const cli = path.join(dist, 'cli.js');
     const code = fs.readFileSync(cli, 'utf8');
@@ -124,6 +125,8 @@ for (const p of PACKAGES) {
     name: src.name,
     version: src.version,
     description: src.description,
+    license: src.license,
+    repository: src.repository,
     type: 'module',
     main: './index.js',
     types: './types/index.d.ts',
