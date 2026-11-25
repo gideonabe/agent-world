@@ -1,7 +1,7 @@
 {
   "name": "@agent-viz/playground",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@agent-viz/core": "0.1.0",
-    "@agent-viz/engine": "0.1.0",
-    "@agent-viz/protocol": "0.1.0",
+    "@agent-viz/core": "0.1.1",
+    "@agent-viz/engine": "0.1.1",
+    "@agent-viz/protocol": "0.1.1",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
     "react": "~19.3.1",
